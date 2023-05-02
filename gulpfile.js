@@ -118,9 +118,9 @@ gulp.task('copy', function(done) {
   
   // Dev task with browserSync
   gulp.task('dev', gulp.series('browserSync', 'sass', 'minify-css', 'minify-js', function() {
-  gulp.watch('scss/.scss', gulp.series('sass'));
-  gulp.watch('css/.css', gulp.series('minify-css'));
-  gulp.watch('js/.js', gulp.series('minify-js'));
+    gulp.watch('scss/**/*.scss', gulp.series('sass'));
+    gulp.watch('css/**/*.css', gulp.series('minify-css'));
+    gulp.watch('js/**/*.js', gulp.series('minify-js'));    
   // Reloads the browser whenever HTML or JS files change
   gulp.watch('.html', browserSync.reload);
   gulp.watch('js/**/*.js', browserSync.reload);

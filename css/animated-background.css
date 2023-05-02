@@ -1,0 +1,14 @@
+body {
+    background-image: url('img/background.png');
+    background-repeat: repeat;
+    animation: animate-background 200s linear infinite;
+  }
+  
+  @keyframes animate-background {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 100% 100%;
+    }
+  }

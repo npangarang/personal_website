@@ -3,6 +3,23 @@
  * Copyright 2013-2017 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-resume/blob/master/LICENSE)
  */
+
+body {
+  background-image: url('background.png');
+  background-repeat: repeat;
+  /* animation: animate-background 10s linear infinite; */
+}
+/* 
+@keyframes animate-background {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+ */
+
 body {
   font-family: 'Open Sans', serif;
   padding-top: 54px;

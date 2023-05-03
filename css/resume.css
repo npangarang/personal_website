@@ -141,3 +141,43 @@ a {
 a:hover, a:focus, a:active {
   color: #824027;
 }
+
+/* .typed-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #0d47a1;
+}
+
+.typed-cursor {
+  font-size: 24px;
+  font-weight: bold;
+  color: #909396;
+} */
+
+.typed-text {
+  font-family: "Roboto", monospace; /* A terminal-like font */
+  font-size: 20px;
+  font-weight: bold;
+  color: #0d47a1;
+}
+
+.typed-cursor {
+  font-family: "Courier New", monospace; /* A terminal-like font */
+  font-size: 20px;
+  font-weight: bold;
+  color: #000000;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+

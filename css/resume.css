@@ -181,3 +181,34 @@ a:hover, a:focus, a:active {
   }
 }
 
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+.chat-bubble {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -10%);
+  background-color: black;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 16px;
+  text-align: center;
+  color: white;
+}
+
+.chat-bubble:before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 40%;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-right: 10px solid rgba(0, 0, 0, 0.8);
+  border-bottom: 5px solid transparent;
+  /* transform: translateY(-1%); */
+  transform: translate(50%, 150%) rotate(-45deg)
+}

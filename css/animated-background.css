@@ -21,12 +21,19 @@ body {
     animation: animate-background 200s linear infinite;
 }
 
+@media (max-width: 768px) {
+  body {
+      background-size: 100% auto; /* Adjust as needed for your specific case */
+      animation: none; /* Optional: Remove the animation on mobile if it's too distracting */
+  }
+}
+
 @keyframes animate-background {
     from {
-      background-position: 5000px 0;
+      background-position: -100% 0%;
     }
     to {
-      background-position: 0 0;
+      background-position: 0% 0%;
     }
 }
 /* 

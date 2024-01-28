@@ -67,6 +67,7 @@ h2 {
 .list-inline-item{
   font-size: 20px;
   size: 30px;
+  /* color: #a10d0d; */
 }
 .navbar-nav .nav-item .nav-link {
   font-weight: 600;
@@ -151,24 +152,15 @@ a:hover, a:focus, a:active {
   color: #824027;
 }
 
-/* .typed-text {
-  font-size: 24px;
-  font-weight: bold;
-  color: #0d47a1;
-}
-
-.typed-cursor {
-  font-size: 24px;
-  font-weight: bold;
-  color: #909396;
-} */
-
 .typed-text {
   /* background-color: rgba(0, 0, 0, 0.5); */
   color: rgb(255, 255, 255);
   padding: 10px;
   border-radius: 20px;
   font-size:18px;
+  /* position: absolute; */
+  /* visibility: hidden; */
+  /* white-space: nowrap; / */
 }
 
 .typed-cursor {

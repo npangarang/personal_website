@@ -23,8 +23,8 @@ body {
 
 @media (max-width: 768px) {
   body {
-      background-image: url('img/mario_long.png'); /* Different static background for mobile */    background-repeat: repeat;
-      background-repeat: no-repeat;
+      background-image: url('img/mario_long.png'); /* Different static background for mobile */
+      background-repeat: repeat-y;
       background-attachment: fixed;/* Fixed backgrounds can behave unexpectedly on mobile, so 'scroll' is often more reliable */
       background-size: contain; /* Or use '100% 100%' if you want to stretch the background */
       animation: none; /* Disable animation on mobile if desired */

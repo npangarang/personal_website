@@ -97,16 +97,19 @@ let jobDescriptions = {
     'Building, Deploying, and Improving models in Freight Tech. 🚚',
   ],
   'experience-list-2': [
+    'Building a platform with my homies to create a New Era of Bar Culture 🐵',
+  ],
+  'experience-list-3': [
     "Automated case classification using BERT and experimented with summarization architectures such as BART, USE, and Longformer.",
     "Utilized GPT-4 and Midjourney to generate short-form media content for Dell's Knowledge Base Articles (troubleshooting guides).",
     "Developed an ensemble model (Catboost + Autoregressor) to predict and mitigate server backup failures from telemetry data, resulting in an estimated savings of up to 1.2 million dollars annually.",
     "Forecasted product-level service requests using Prophet models, optimizing agent workload allocation."
   ],
-  'experience-list-3': [
+  'experience-list-4': [
     "Implemented Prophet, SARIMA, TBATs, and ETS models and engineered additional configurations to improve forecast accuracy.",
     "Built a user-friendly web app using Streamlit and Prophet for service center demand forecasting."
   ],
-  'experience-list-4': [
+  'experience-list-5': [
     "Automated auditing and analysis with R scripts, and built Seaborn visualizations and Smartsheet dashboards for performance reporting.",
     "Led a team to develop visualizations, dashboards, and researched API integration and ML-based forecasting approaches."
   ]
@@ -175,6 +178,15 @@ document.addEventListener('DOMContentLoaded', function() {
       badge.style.backgroundColor = randomColor;
     });
 
+  var profileImage = document.querySelector('.img-profile');
+
+  profileImage.addEventListener('mouseover', function () {
+    this.src = 'css/img/headshot.png'; // path to the hover image
+  });
+
+  profileImage.addEventListener('mouseout', function () {
+    this.src = 'css/img/profile.jpg'; // path to the original image
+  });
 });
 
 

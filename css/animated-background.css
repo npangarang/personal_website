@@ -23,10 +23,14 @@ body {
 
 @media (max-width: 768px) {
   body {
-      background-size: 100% auto; /* Adjust as needed for your specific case */
-      animation: none; /* Optional: Remove the animation on mobile if it's too distracting */
+      background-image: url('img/mario_long.png'); /* Different static background for mobile */
+      background-repeat: no-repeat;
+      background-attachment: scroll; /* Fixed backgrounds can behave unexpectedly on mobile, so 'scroll' is often more reliable */
+      background-size: contain; /* Or use '100% 100%' if you want to stretch the background */
+      animation: none; /* Disable animation on mobile if desired */
   }
 }
+
 
 @keyframes animate-background {
     from {

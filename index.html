@@ -37,14 +37,14 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
       <a class="navbar-brand js-scroll-trigger" href="#page-top">
-        <span class="d-block d-lg-none"></span>
-        <!-- <span class="d-none d-lg-block">
-          <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="css/img/profile.jpg" alt="">
-        </span> -->
-        <!-- <span class="d-none d-lg-block">
-          <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="css/img/profile.jpg" alt="">
-          <div class="chat-bubble" id="chat-bubble">hi bro</div>
-        </span> -->
+        <span class="d-block d-lg-none">
+          <!-- <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="css/img/profile.jpg" alt=""> -->
+          <!-- <div class="profile-container">
+            <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="css/img/profile.jpg" alt="">
+            <div class="chat-bubble" id="chat-bubble">hi bro</div>
+          </div> -->
+        </span>
+
         <span class="d-none d-lg-block">
           <div class="profile-container">
             <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="css/img/profile.jpg" alt="">
@@ -52,18 +52,13 @@
           </div>
         </span>
         
-        <!-- <span class="d-none d-lg-block position-relative">
-          <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="css/img/profile.jpg" alt="">
-          <span class="position-absolute chat-bubble">
-            <span id="greeting"></span>
-          </span> -->
         </span>
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav text-container">
           <li class="nav-item">
             <a class="nav-link js-scroll-trigger" href="#about">About</a>
           </li>
@@ -86,17 +81,13 @@
       <section class="resume-section p-3 p-lg-5 d-flex d-column" id="about">
         <div class="my-auto">
           <h1 class="mb-0">Neel
-            <span class="text-primary">Panging</span>
+            <div class="text-primary">Panging</div>
           </h1>
-          <span id="typewriter-text"></span>
-          <div class="subheading mb-5"><i class="icon-location-pin"></i> Austin, TX</div>
-          <!-- <span id="typewriter-text" class="typed-cursor"></span>
-          <span id="typewriter-text" class="typed-text"></span> -->
-          <!-- <span id="typewriter-text"></span> -->
-
-
-          <p class="mb-5">I'm a recent Applied Math graduate from UT Austin, full-time Data Scientist at Dell Technologies, and currently pursuing my MS in Computer Science (ML) at Georgia Tech.<br><br>
-            I love tackling challenging technical and analytical problems and working on projects/products in Data Science, Machine Learning, Full Stack Development, and Entrepreneurship.<br><br>When I'm not coding, you can find me engaged in health/fitness, tennis, strategy games, and deepening my understanding of the world through podcasts and reading.</p>
+          <p></p>
+          <span id="typewriter-text" class="text-container"></span>
+          <p></p>
+          <p class="text-container">Yo! I'm a Data Scientist at Transfix and an MS in Computer Science (ML) candidate at Georgia Tech. I love tricky problems and working on products in Data Science, Machine Learning, and Full Stack Development.
+            When I'm not writing code, you can find me playing/watching sports, lifting weights, and grinding strategy games.</p>
             <ul class="list-inline list-social-icons mb-0">
             <!-- <li class="list-inline-item">
               <a href="https://www.facebook.com/yourprofile">
@@ -145,50 +136,85 @@
       <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="experience">
         <div class="my-auto">
           <h2 class="mb-5">Experience</h2>
-          <div class="resume-item d-flex flex-column flex-md-row mb-5">
-            <img class="mr-3" src="css/img/dell-logo.png" alt="Dell Tech logo" width="50" height="50">
-            <div class="resume-content mr-auto">
-              <h3 class="mb-0">Data Scientist</h3>
-              <div class="subheading mb-3">Dell Technologies</div>
-              <span class="text-primary">June 2022 - Present<br><br></span>
-              <ul>
-                <li>Automated case classification using BERT and experimented with summarization architectures such as BART, USE, and Longformer.</li>
-                <li>Utilized GPT-4 and Midjourney to generate short-form media content for Dell's Knowledge Base Articles (troubleshooting guides).</li>
-                <li>Developed an ensemble model (Catboost + Autoregressor) to predict and mitigate server backup failures from telemetry data, resulting in an estimated savings of up to 1.2 million dollars annually.</li>
-                <li>Forecasted product-level service requests using Prophet models, optimizing agent workload allocation.</li>
-              </ul>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="resume-item d-flex flex-column flex-md-row mb-5 light-container">
+                <a href="https://transfix.io/" target="_blank">
+                  <img class="mr-3" src="css/img/transfix.png" alt="Dell Tech logo" width="50" height="50">
+                </a>
+                <!-- <img class="mr-3" src="css/img/transfix.png" alt="Dell Tech logo" width="50" height="50"> -->
+                <div class="resume-content mr-auto">
+                  <h3 class="mb-0">Data Scientist / ML Engineer</h3>
+                  <div class="subheading mb-3">Transfix</div>
+                  <span class="text-primary">July 2023 - Present<br><br></span>
+                  <ul class="text-container" id="experience-list-1">
+                    <li>> Building, Deploying, and Improving models in Freight Tech 🚚</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="resume-item d-flex flex-column flex-md-row mb-5 light-container">
+                <a href="https://www.dell.com/en-us" target="_blank">
+                  <img class="mr-3" src="css/img/dell-logo.png" alt="Dell Tech logo" width="50" height="50">
+                </a>
+                <div class="resume-content mr-auto">
+                  <h3 class="mb-0">Data Scientist</h3>
+                  <div class="subheading mb-3">Dell Technologies</div>
+                  <span class="text-primary">June 2022 - July 2023<br><br></span>
+                  <ul class="text-container" id="experience-list-2">
+                      <li>Automated case classification using BERT and experimented with summarization architectures such as BART, USE, and Longformer.</li>
+                      <li>Utilized GPT-4 and Midjourney to generate short-form media content for Dell's Knowledge Base Articles (troubleshooting guides).</li>
+                      <li>Developed an ensemble model (Catboost + Autoregressor) to predict and mitigate server backup failures from telemetry data, resulting in an estimated savings of up to 1.2 million dollars annually.</li>
+                      <li>Forecasted product-level service requests using Prophet models, optimizing agent workload allocation.</li>
+                  </ul>
+                  </span>
+
+                </div>
+              </div>
             </div>
           </div>
-          <div class="resume-item d-flex flex-column flex-md-row mb-5">
-            <img class="mr-3" src="css/img/dell-logo.png" alt="Dell Tech logo" width="50" height="50">
-            <div class="resume-content mr-auto">
-              <h3 class="mb-0">Data Science Intern</h3>
-              <div class="subheading mb-3">Dell Technologies</div>
-              <span class="text-primary">June 2020 - Aug 2020 | May 2021 - Aug 2021<br><br></span>
-              <ul>
-                <li>Implemented Prophet, SARIMA, TBATs, and ETS models and engineered additional configurations to improve forecast accuracy.</li>
-                <li>Built a user-friendly web app using Streamlit and Prophet for service center demand forecasting.</li>
-              </ul>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="resume-item d-flex flex-column flex-md-row mb-5 light-container">
+                <a href="https://www.dell.com/en-us" target="_blank">
+                  <img class="mr-3" src="css/img/dell-logo.png" alt="Dell Tech logo" width="50" height="50">
+                </a>
+                <div class="resume-content mr-auto">
+                  <h3 class="mb-0">Data Science Intern</h3>
+                  <div class="subheading mb-3">Dell Technologies</div>
+                  <span class="text-primary">June 2020 - Aug 2020 | May 2021 - Aug 2021<br><br></span>
+                  <ul class="text-container" id="experience-list-3">
+                    <li>> Implemented Prophet, SARIMA, TBATs, and ETS models and engineered additional configurations to improve forecast accuracy.</li>
+                    <li>> Built a user-friendly web app using Streamlit and Prophet for service center demand forecasting.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-            <!-- <div class="resume-date text-md-right">
-              <span class="text-primary">June 2020 - Aug 2020 | May 2021 - Aug 2021</span>
-            </div> -->
-          </div>
-          <div class="resume-item d-flex flex-column flex-md-row mb-5">
-            <img class="mr-3" src="css/img/on-ramps-logo.jpg" alt="OnRamps logo" width="50" height="50">
-            <div class="resume-content mr-auto">
-              <h3 class="mb-0">Data Science Intern</h3>
-              <div class="subheading mb-3">OnRamps</div>
-              <span class="text-primary">Sept 2020 - April 2021<br><br></span>
-              <ul>
-                <li>Automated auditing and analysis with R scripts, and built Seaborn visualizations and Smartsheet dashboards for performance reporting.</li>
-                <li>Led a team to develop visualizations, dashboards, and researched API integration and ML-based forecasting approaches.</li>
-              </ul>
+            <div class="col-md-6">
+              <div class="resume-item d-flex flex-column flex-md-row mb-5 light-container">
+                <a href="https://onramps.utexas.edu/" target="_blank">
+                  <img class="mr-3" src="css/img/on-ramps-logo.jpg" alt="Dell Tech logo" width="50" height="50">
+                </a>            <div class="resume-content mr-auto">
+                  <h3 class="mb-0">Data Science Intern</h3>
+                  <div class="subheading mb-3">OnRamps</div>
+                  <span class="text-primary">Sept 2020 - April 2021<br><br></span>
+                  <ul class="text-container" id="experience-list-4">
+                    <li>> Automated auditing and analysis with R scripts, and built Seaborn visualizations and Smartsheet dashboards for performance reporting.</li>
+                    <li>> Led a team to develop visualizations, dashboards, and researched API integration and ML-based forecasting approaches.</li>
+                  </ul>
+                </div>
+                <!-- <div class="resume-date text-md-right">
+                  <span class="text-primary">Sept 2020 - April 2021</span>
+                </div> -->
+                  <!-- <div class="resume-date text-md-right">
+                    <span class="text-primary">Sept 2020 - April 2021</span>
+                  </div> -->
+                </div>
             </div>
-            <!-- <div class="resume-date text-md-right">
-              <span class="text-primary">Sept 2020 - April 2021</span>
-            </div> -->
+
           </div>
+        </div>
 
         </div>
 
@@ -196,9 +222,9 @@
 
       <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="skills">
         <div class="my-auto">
-          <h2 class="mb-5">Skills</h2>
-
-          <div class="subheading mb-3">Programming Languages &amp; Tools</div>
+          <h2 class="mb-5 ">Skills</h2>
+          <h3 class="mb-0">Programming Languages &amp; Tools</h3>
+          <p></p>
           <ul class="list-inline list-icons">
               <li class="list-inline-item">
                 <i class="devicons devicons-python"></i>
@@ -219,16 +245,17 @@
                 <i class="devicons devicon-flutter-plain"></i>
               </li>
               <li class="list-inline-item">
-                <i class="devicon-matlab-plain"></i>
+                <i class="devicons devicon-matlab-plain"></i>
               </li>
               <li class="list-inline-item">
-                <i class="devicon-cplusplus-plain"></i>
+                <i class="devicons devicon-cplusplus-plain"></i>
               </li>
               <li class="list-inline-item">
                 <i class="devicons devicons-html5"></i>
               </li>
           </ul>
-          <div class="subheading mb-3">Data Analysis &amp; Machine Learning</div>
+          <h3 class="mb-0">Data Analysis &amp; Machine Learning</h3>
+          <p></p>
           <ul class="list-inline">
             <li class="list-inline-item">
               <span class="badge badge-primary" style="background-color: #0d47a1;">NumPy</span>
@@ -264,8 +291,8 @@
               <span class="badge badge-primary">MLFlow</span>
             </li>
           </ul>
-
-          <div class="subheading mb-3">Modeling</div>
+          <h3 class="mb-0">Modeling Experience</h3>
+          <p></p>
       <ul class="list-inline">
         <li class="list-inline-item">
           <span class="badge badge-primary">Classification</span>
@@ -289,50 +316,59 @@
           <span class="badge badge-primary">NLP</span>
         </li>
       </ul>
-      <div class="subheading mb-3">Cloud Technologies</div>
-<ul class="list-inline">
+      <h3 class="mb-0">Cloud Technologies</h3>
+      <p></p>
+      <ul class="list-inline">
   <li class="list-inline-item">
-    <span class="badge badge-secondary">Amazon Web Services (AWS)</span>
+    <span class="badge badge-secondary">AWS</span>
   </li>
   <li class="list-inline-item">
-    <span class="badge badge-secondary">Google Cloud Platform (GCP)</span>
+    <span class="badge badge-secondary">GCP</span>
   </li>
   <li class="list-inline-item">
-    <span class="badge badge-secondary">Microsoft Azure</span>
+    <span class="badge badge-secondary">Azure</span>
   </li>
 </ul>
         </div>
       </section>
-
-
       <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="education">
         <div class="my-auto">
           <h2 class="mb-5">Education</h2>
-          <div class="resume-item d-flex flex-column flex-md-row mb-5">
-            <img class="mr-3" src="css/img/georgia-tech-emblem.png" alt="Georgia Tech emblem" width="50" height="50">
-            <div class="resume-content">
-              <h3 class="mb-0">Georgia Institute of Technology</h3>
-              <div class="subheading mb-3">Master of Science</div>
-              <div>Computer Science - Machine Learning Specialization</div>
-              <p>Jan 2023 - Present (Part-Time) GPA: 4.0</p>
-              <ul>
-                <li>Coursework: Data & Visual Analytics, Machine Learning for Trading</li>
-              </ul>
+          <div class="row">
+          <div class="col-lg-6">
+            <div class="resume-item d-flex flex-column flex-md-row mb-5 light-container">
+              <img class="mr-3" src="css/img/georgia-tech-emblem.png" alt="Georgia Tech emblem" width="50" height="50">
+              <div class="resume-content">
+                <h3 class="mb-0">Georgia Institute of Technology</h3>
+                <div class="subheading mb-3">Master of Science</div>
+                <div class="text-container">
+                  <div>Computer Science - Machine Learning Specialization</div>
+                  <p>Jan 2023 - Present GPA: 4.0</p>
+                  <ul>
+                    <li>Coursework: Graduate ML, Reinforcement Learning, ML for Trading, Data & Visual Analytics, AI Ethics, Global Entrepreneurship, Cognitive Science</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="resume-item d-flex flex-column flex-md-row">
-            <img class="mr-3" src="css/img/ut-austin-emblem.png" alt="UT Austin emblem" width="50" height="50">
-            <div class="resume-content">
-              <h3 class="mb-0">The University of Texas at Austin</h3>
-              <div class="subheading mb-3">Bachelor of Science</div>
-              <div>Applied Math & Statistics - Computer Science Minor</div>
-              <p>Aug 2018 -- Dec 2021 GPA: 3.77</p>
-              <ul>
-                <li>Additional coursework in Physics</li>
-                <li>VP of Machine Learning club, Tennis club competitor, Undergraduate Research</li>
-              </ul>
+          <div class="col-lg-6">
+            <div class="resume-item d-flex flex-column flex-md-row light-container">
+              <img class="mr-3" src="css/img/ut-austin-emblem.png" alt="UT Austin emblem" width="50" height="50">
+              <div class="resume-content">
+                <h3 class="mb-0">The University of Texas at Austin</h3>
+                <div class="subheading mb-3">Bachelor of Science</div>
+                <div class="text-container">
+                  <div>Applied Math & Statistics - Computer Science Minor</div>
+                  <p>Aug 2018 -- Dec 2021 GPA: 3.77</p>
+                  <ul>
+                    <li>Additional coursework in Physics</li>
+                    <li>VP of Machine Learning club, Tennis club competitor, Undergraduate Research</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
         </div>
       </section>
       

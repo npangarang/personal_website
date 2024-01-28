@@ -49,21 +49,30 @@ h2 {
 .list-social-icons a:hover {
   color: #0d47a1;
 }
-.list-social-icons a .fa-lg {
-  font-size: 1.75rem;
-}
 
-.list-icons {
-  font-size: 3rem;
+.devicons {
+  font-size: 72px; /* Adjust this value as needed */
 }
+/* .list-social-icons a .fa-lg {
+  font-size: 1.75rem;
+} */
+
+/* .list-icons {
+  font-size: 3rem;
+} */
 .list-icons .list-inline-item i:hover {
   color: #0d47a1;
 }
 
-#sideNav .navbar-nav .nav-item .nav-link {
+.list-inline-item{
+  font-size: 20px;
+  size: 30px;
+}
+.navbar-nav .nav-item .nav-link {
   font-weight: 600;
   text-transform: uppercase;
 }
+
 
 @media (min-width: 992px) {
   #sideNav {
@@ -128,7 +137,7 @@ section.resume-section .resume-item .resume-date {
   }
 }
 .bg-primary {
-  background-color: #0d47a1 !important;
+  background-color: #0d48a1ae !important;
 }
 
 .text-primary {
@@ -155,17 +164,18 @@ a:hover, a:focus, a:active {
 } */
 
 .typed-text {
-  font-family: "Roboto", monospace; /* A terminal-like font */
-  font-size: 20px;
-  font-weight: bold;
-  color: #0d47a1;
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  color: rgb(255, 255, 255);
+  padding: 10px;
+  border-radius: 20px;
+  font-size:18px;
 }
 
 .typed-cursor {
-  font-family: "Courier New", monospace; /* A terminal-like font */
+  font-family: "Roboto", monospace;
   font-size: 20px;
   font-weight: bold;
-  color: #000000;
+  color: #ffffff;
   animation: blink 1s infinite;
 }
 
@@ -211,4 +221,23 @@ a:hover, a:focus, a:active {
   border-bottom: 5px solid transparent;
   /* transform: translateY(-1%); */
   transform: translate(50%, 150%) rotate(-45deg)
+}
+
+.text-container {
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with 50% opacity */
+  color: white; /* White text color */
+  padding: 10px; /* Some padding */
+  border-radius: 20px; /* Rounded corners */
+  font-size:18px;
+}
+
+.light-container {
+  background-color: rgba(255, 255, 255, 0.75); /* Black background with 50% opacity */
+  padding: 10px; /* Some padding */
+  border-radius: 20px; /* Rounded corners */
+  /* font-size:18px; */
+}
+
+.larger-text {
+  font-size: 20px;
 }

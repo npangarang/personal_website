@@ -1,5 +1,5 @@
-body {
-    background-image: url('img/background.png');
+/* body {
+    background-image: url('img/background2.png');
     background-repeat: repeat;
     animation: animate-background 200s linear infinite;
   }
@@ -11,4 +11,39 @@ body {
     100% {
       background-position: 100% 100%;
     }
+  } */
+
+body {
+    background-image: url('img/b3.png');
+    background-repeat: repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    animation: animate-background 200s linear infinite;
+}
+
+@keyframes animate-background {
+    from {
+      background-position: 5000px 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+}
+/* 
+body {
+  background-image: url('img/mario1.png');
+  background-repeat: repeat;
+  background-size: 75% 150%;
+  background-attachment: fixed;
+  animation: pan-background 60s linear infinite;
+}
+
+@keyframes pan-background {
+  from {
+    background-position: 0% 0%;
   }
+  to {
+    background-position: 0% 300%;
+  }
+}
+ */

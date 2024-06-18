@@ -27,7 +27,6 @@ with st.sidebar:
 def stream_text(full_text):
 	for word in full_text.split(" "):
 		if word == 'BREAK':
-			print('bruh')
 			yield word + '\n'
 		else:
 			yield word + " "
@@ -53,7 +52,6 @@ if page == 'About':
 elif page == 'Experience':
 	st.markdown('## Experience 💼')
 	for exp, info in WORK_EXPERIENCE.items():
-		print(info.keys())
 		with st.container(border=True):
 			company, role = exp.split(' | ')
 			col1, col2 = st.columns([1,10])

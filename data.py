@@ -54,9 +54,9 @@ WORK_EXPERIENCE = {
         'location': 'New York City, NY · Remote',
         'img_path': 'images/transfix_logo.jpeg',
         'description': """
-            - Co-authored the end-to-end development of a novel, bottom-up forecasting model to predict short-term trucking rates for 18,000+ zip5-zip5 lanes.
-            - Refactored Transfix’s core freight auctioning algorithm to decrease win-rate bias by over 80%, enhancing model reliability and accuracy.
-            - Solved the cold-start problem by implementing domicile-based recommendations in Transfix’s freight recommender platform, reducing the number of empty recommendations by 45%.
+            - Authored the end-to-end development of a novel, bottom-up forecasting model to predict short-term trucking rates for 18,000+ market lanes.
+            - Refactored Transfix's core freight pricing algorithm to decrease win-rate bias by over 80%, enhancing model reliability and accuracy.
+            - Enhanced Transfix’s freight recommender platform by revising the recommendation algorithm to better serve new and infrequent users, reducing the number of empty recommendations by 45%.
             - Leveraged Docker, GitHub, Airflow, AWS SageMaker, and other tools to manage, monitor, and deploy production models.
         """
     },

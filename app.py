@@ -34,20 +34,22 @@ def stream_text(full_text):
         
 if page == 'About':
 	st.markdown('## About 🥷🏼')
-	col1, col2, col3, _ = st.columns([1,1,1,20])
+	with st.container(border=True):
+		if 'viewed_about' not in st.session_state:
+			st.session_state.viewed_about = False
+		if not st.session_state.viewed_about:
+			st.write_stream(stream_text(ABOUT))
+			st.session_state.viewed_about = True
+		else:
+			st.write(ABOUT)
+	col1, col2, col3, _ = st.columns([1,1,1,5])
 	with col1:
-		st.markdown('[![Linkedin](https://img.icons8.com/?size=30&id=8808&format=png&color=4338C5)](https://www.linkedin.com/in/neel-panging)')
+		st.markdown('[![Linkedin](https://img.icons8.com/?size=50&id=8808&format=png&color=4338C5)](https://www.linkedin.com/in/neel-panging)')
 	with col2:
-		st.markdown('[![Github](https://img.icons8.com/?size=30&id=12599&format=png&color=4338C5)](https://github.com/npangarang)')
+		st.markdown('[![Github](https://img.icons8.com/?size=50&id=12599&format=png&color=4338C5)](https://github.com/npangarang)')
 	with col3:
-		st.markdown('[![Email](https://img.icons8.com/?size=30&id=12623&format=png&color=4338C5)](mailto:neelpanging@live.com)')
-	if 'viewed_about' not in st.session_state:
-		st.session_state.viewed_about = False
-	if not st.session_state.viewed_about:
-		st.write_stream(stream_text(ABOUT))
-		st.session_state.viewed_about = True
-	else:
-		st.write(ABOUT)
+		st.markdown('[![Email](https://img.icons8.com/?size=50&id=60688&format=png&color=4338C5)](mailto:neelpanging@live.com)')
+
 
 elif page == 'Experience':
 	st.markdown('## Experience 💼')

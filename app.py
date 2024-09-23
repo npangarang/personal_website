@@ -8,7 +8,7 @@ st.set_page_config(page_title="Neel Panging", layout="wide")
 with st.sidebar:
     _, col, _ = st.columns([1,3,1])
     with col:
-        st.image("images/profile_pic.png")
+        st.image("images/pro_pic.png")
     page = option_menu(
 		"Neel Panging", 
 		['About', 'Experience', 'Education', 'Skills'],

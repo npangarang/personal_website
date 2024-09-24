@@ -65,7 +65,7 @@ WORK_EXPERIENCE = {
         'location': 'Austin, TX · Hybrid',
         'img_path': 'images/dell_logo.jpeg',
         'description': """
-            - Implemented a BERT model to automate the summarization and classification of customer service cases, saving support agents dozens of hours of manual analysis each week. Experimented with various transformer architectures including BART, GPT, and Longformer.
+            - Implemented a BERT model to automate the summarization and classification of customer service cases, saving support agents dozens of hours of manual analysis each week. Experimented with prompt engineering and fine-tuning on various LLM architectures including BART, GPT, and Longformer.
             - Developed an ensemble classification model (Catboost + Autoregressor) to predict server backup failures from server logs, preemptively identifying potential failures and saving Dell approximately $1.2 million annually in compute costs.
             - Forecasted product-level service requests using Prophet models, optimizing agent workload allocation, resulting in a 7% reduction in customer wait times.
         """

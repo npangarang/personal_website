@@ -1,1 +1,3 @@
-Welcome to my personal website! This was created and deployed with [Streamlit](https://streamlit.io/)
+Welcome to my personal website, built with Streamlit.
+
+This template ios based off of: https://github.com/divanov11/Digital-Resume. 

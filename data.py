@@ -1,7 +1,7 @@
 ABOUT = """
-	Hey I'm Neel 👋🏽, a Data Scientist with 2+ years of full-time experience based out of :blue[Austin, TX] and former Longhorn 🤘🏽. I'm also currently completing my M.S. in Computer Science (ML) at Georgia Tech.
+	Hey I'm Neel 👋🏽, a Data Scientist with 2+ years of full-time experience based out of :blue[Austin, TX].
 
-	My professional interests include but are not limited to Machine Learning, Data Science, Full Stack Dev, Cloud Tech, and Startups 👨🏽‍💻.
+	My professional interests include Machine Learning, Data Science, Full Stack Dev, Cloud, and Startups 👨🏽‍💻.
  
 	When I'm not writing code, you can find me playing tennis 🎾, lifting weights 🏋🏽‍♂️, trying new foods 🍔, traveling ✈️, and grinding games like Super Smash Bros Ultimate 🥊 and Chess ♟️.
 """
@@ -9,18 +9,18 @@ ABOUT = """
 EDUCATION = {
     'Georgia Institute of Technology': {
         'description': """
-            🗓️ **Jan 2023 - Present**
             - **:blue[MS Computer Science]** - Machine Learning Specialization
         """,
-        'img_path' :'images/georgia-tech-emblem.png'
+        'img_path' :'images/georgia-tech-emblem.png',
+        'year': '**2024**'
     },
     'The University of Texas at Austin': {
         'description': """
-            🗓️ **Aug 2018 - Dec 2021**
             - **:blue[BS Applied Math & Statistics]** - Computer Science Minor
             - **Activities:** VP of Machine Learning club, Tennis club competitor
         """,
-        'img_path' :'images/ut-austin-emblem.png'
+        'img_path' :'images/ut-austin-emblem.png',
+        'year': '**2022**'
     }
 }
 

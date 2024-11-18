@@ -70,6 +70,18 @@ WORK_EXPERIENCE = {
             - Forecasted product-level service requests using Prophet models, optimizing agent workload allocation, resulting in a 7% reduction in customer wait times.
         """
     },
+    'BarMonkey.io | Founder/Full Stack Developer': {
+        'duration': 'Jul 2023 - Aug 2024',
+        'location': 'Austin, TX · Remote',
+        'img_path': 'images/barmonkey_logo.png',  # Update with the actual image path
+        'description': """
+            - Building a nightlife companion app that enables users to find local venues, connect with friends, and organize events.
+            - Designed and developed the UI/UX using Figma and Flutter while integrating Firebase for back-end infrastructure.
+            - Implemented secure user authentication, including OTP verification, with custom APIs built using Node.js, Express, and MongoDB.
+            - Developed dynamic geolocation features to recommend personalized venue suggestions based on user proximity and preferences.
+            - Scaled back-end architecture for deployment using Docker containers and AWS EC2, ensuring reliability and scalability.
+        """
+    },
     'Dell Technologies | Data Science Intern (2x)': {
         'duration': 'June 2020 - Aug 2020 | May 2021 - Aug 2021 · (6 mos)',
         'location': 'Austin, TX · Remote',

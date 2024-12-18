@@ -1,7 +1,6 @@
 from pathlib import Path
 import streamlit as st
 from PIL import Image
-from st_social_media_links import SocialMediaIcons
 from data import ABOUT, EDUCATION, SKILLS, WORK_EXPERIENCE
 import time
 
@@ -15,10 +14,6 @@ PAGE_ICON = ":rocket:"
 NAME = "Neel Panging"
 
 EMAIL = "neelpanging@live.com"
-SOCIAL_MEDIA = {
-    "LinkedIn": "https://www.linkedin.com/in/neel-panging",
-    "GitHub": "https://github.com/npangarang",
-}
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON)
@@ -56,12 +51,26 @@ with col1:
     # st.image('images/pro_pic.png')
     st.markdown('</div>', unsafe_allow_html=True)
     st.image('images/pro_pic.png')
-    social_media_links = [
-		"https://www.linkedin.com/in/neel-panging",
-		"https://github.com/npangarang",
-	]
-    social_media_icons = SocialMediaIcons(social_media_links)
-    social_media_icons.render()
+    # --- SOCIAL LINKS ---
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        st.link_button("", "https://www.linkedin.com/in/neel-panging", icon=":material/link:", type="primary")
+    with col_b:
+        st.link_button("", "https://github.com/npangarang", icon=":material/code:", type="primary")
+    with col_c:
+        st.link_button("", "https://drive.google.com/file/d/1BiLClZpoRzsl8FU84lSYPCBJtzOyhcvW/view?usp=sharing", icon=":material/description:", type="primary")
+    st.markdown(
+        '''
+        <div style="text-align: center;">
+            <a href="mailto:neelpanging@live.com" style="color: blue !important; text-decoration: none;">
+                ✉️ hmu!
+            </a>
+        </div>
+        ''',
+        unsafe_allow_html=True
+    )
+
+
 with col2:
     st.title(NAME)
     if 'viewed_about' not in st.session_state:
@@ -72,32 +81,25 @@ with col2:
     else:
         st.write(ABOUT)
 
-# --- SOCIAL LINKS ---
-social_media_links = [
-    "https://www.linkedin.com/in/neel-panging",
-    "https://github.com/npangarang",
-]
-social_media_icons = SocialMediaIcons(social_media_links)
-# social_media_icons.render()
 st.write('\n')
 st.divider()
-# --- SKILLS ---
-st.markdown('## Skills 🛠️')
-for category, skills in SKILLS.items():
-    st.write(f'**:blue[{category}]**: {", ".join(skills)}')
-st.divider()
-
 # --- WORK HISTORY ---
 st.markdown('## Experience 💼')
 for exp, info in WORK_EXPERIENCE.items():
-    company, role = exp.split(' | ')
+    company, role = exp, info['role']
     col1, col2 = st.columns([1, 10])
     col1.image(info['img_path'])
-    col2.subheader(f'{company} | {role}')
+    col2.subheader(f'{company} | :blue[{role}]')
     st.write(f'🗓️ **{info["duration"]}**')
     st.write(f'📍 **{info["location"]}**')
     st.write(info['description'])
     st.write()
+st.divider()
+
+# --- SKILLS ---
+st.markdown('## Skills 🛠️')
+for category, skills in SKILLS.items():
+    st.write(f'**:blue[{category}]**: {", ".join(skills)}')
 st.divider()
 
 # --- EDUCATION ---

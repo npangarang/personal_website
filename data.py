@@ -3,7 +3,7 @@ ABOUT = """
 
 	My professional interests include Machine Learning, Data Science, Full Stack Dev, Cloud, and Startups 👨🏽‍💻.
  
-	When I'm not writing code, you can find me playing tennis 🎾, lifting weights 🏋🏽‍♂️, trying new foods 🍔, traveling ✈️, and grinding games like Super Smash Bros Ultimate 🥊 and Chess ♟️.
+	When I'm not writing code, you can find me playing racket sports 🎾, lifting weights 🏋🏽‍♂️, eating food 🍔, traveling ✈️, and grinding games like Super Smash Bros Ultimate 🥊 and Chess ♟️.
 """
 
 EDUCATION = {
@@ -49,7 +49,8 @@ SKILLS = {
 }
 
 WORK_EXPERIENCE = {
-    'Transfix | Data Scientist': {
+    'Transfix': {
+        'role': 'Data Scientist',
         'duration': 'Jul 2023 - Jun 2024 · (1yr)',
         'location': 'New York City, NY · Remote',
         'img_path': 'images/transfix_logo.jpeg',
@@ -60,7 +61,8 @@ WORK_EXPERIENCE = {
             - Leveraged Docker, GitHub, Airflow, AWS SageMaker, and other tools to manage, monitor, and deploy production models.
         """
     },
-    'Dell Technologies | Data Scientist': {
+    'Dell Technologies': {
+        'role': 'Data Scientist',
         'duration': 'Jun 2022 - July 2023 · (1yr)',
         'location': 'Austin, TX · Hybrid',
         'img_path': 'images/dell_logo.jpeg',
@@ -70,7 +72,8 @@ WORK_EXPERIENCE = {
             - Forecasted product-level service requests using Prophet models, optimizing agent workload allocation, resulting in a 7% reduction in customer wait times.
         """
     },
-    'BarMonkey.io | Founder/Full Stack Developer': {
+    'BarMonkey.io': {
+        'role': 'Founder/Full Stack Developer',
         'duration': 'Jul 2023 - Aug 2024',
         'location': 'Austin, TX · Remote',
         'img_path': 'images/barmonkey_logo.png',  # Update with the actual image path
@@ -82,7 +85,8 @@ WORK_EXPERIENCE = {
             - Scaled back-end architecture for deployment using Docker containers and AWS EC2, ensuring reliability and scalability.
         """
     },
-    'Dell Technologies | Data Science Intern (2x)': {
+    'Dell Technologies': {
+        'role': 'Data Science Intern (2x)',
         'duration': 'June 2020 - Aug 2020 | May 2021 - Aug 2021 · (6 mos)',
         'location': 'Austin, TX · Remote',
         'img_path': 'images/dell_logo.jpeg',
@@ -91,7 +95,8 @@ WORK_EXPERIENCE = {
         - Developed an ensemble of Prophet, SARIMA, TBATs, and ETS time-series models to forecast repeat component dispatches.
         """
     },
-    'OnRamps | Data Science Intern': {
+    'OnRamps': {
+        'role': 'Data Science Intern',
         'duration': 'Sep 2020 - April 2021 · (8 mos)',
         'location': 'Austin, TX · Remote',
         'img_path': 'images/onramps_logo.jpeg',

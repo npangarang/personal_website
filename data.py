@@ -1,5 +1,5 @@
 ABOUT = """
-	Hey I'm Neel 👋🏽, a Data Scientist with 2+ years of full-time experience based out of :blue[Austin, TX].
+	Hey I'm Neel 👋🏽, a Data Scientist with 3+ years of experience based out of :blue[Austin, TX]. I have a strong background in Math (B.S. :orange[UT Austin '22]) and Computer Science (M.S. :orange[Georgia Tech '24]), and I love building cool stuff with data 🤖.
 
 	My professional interests include Machine Learning, Data Science, Full Stack Dev, Cloud, and Startups 👨🏽‍💻.
  
@@ -12,98 +12,74 @@ EDUCATION = {
             - **:blue[MS Computer Science]** - Machine Learning Specialization
         """,
         'img_path' :'images/georgia-tech-emblem.png',
-        'year': '**2024**'
+        'year': '**June 2024**',
+        'location': 'Atlanta, GA (Remote)'
     },
     'The University of Texas at Austin': {
         'description': """
-            - **:blue[BS Applied Math & Statistics]** - Computer Science Minor
-            - **Activities:** VP of Machine Learning club, Tennis club competitor
+            - **:blue[BS Applied Mathematics]** | Minors in Computer Science and Statistics
         """,
         'img_path' :'images/ut-austin-emblem.png',
-        'year': '**2022**'
+        'year': '**December 2021**',
+        'location': 'Austin, TX'
     }
 }
 
 SKILLS = {
     'Languages and Tools': [
-		"Python", "SQL", "R", "Java", "JavaScript", "MATLAB", "C++", "Flutter", "Git/GitHub", 
-		"Jupyter", "Visual Studio Code"
+		"Python", "SQL", "R"
 	],
 	'Data Analysis & Visualization': [
-		"NumPy", "Pandas", "Plotly/Dash", "Seaborn", "Streamlit", "Matplotlib", 
-		"Tableau", "Excel", "Looker"
+		"NumPy", "Pandas", "Plotly/Dash", "Seaborn", "Streamlit", "Matplotlib", "Looker"
 	],
 	'Machine Learning': [
-		"Scikit-Learn", "TensorFlow", "Keras", "PyTorch", "XGBoost", "LightGBM", 
+		"Scikit-Learn", "TensorFlow", "Keras", "PyTorch", "XGBoost", "LightGBM",
 		"NLTK", "spaCy", "MLFlow", "SHAP"
 	],
-	'Modeling': [
-		"Classification", "Regression", "Clustering", "Deep Learning", "Reinforcement Learning", 
-		"Time Series Analysis", "NLP", "Bayesian Networks", "Dimensionality Reduction", 
+	'Data Science & Modeling': [
+		"Classification", "Regression", "Clustering", "Deep Learning", "Reinforcement Learning",
+		"Time Series Analysis", "NLP", "Bayesian Networks", "Dimensionality Reduction",
 		"Feature Engineering"
 	],
 	'Cloud': [
-		"AWS (Sagemaker, Bedrock, S3, EC2)", "Docker", "Airflow", "Azure ML", 
-		"Firebase", "GCP"
+		"AWS (Sagemaker, Bedrock, S3, EC2)", "Docker", "Airflow", "Supabase", "Firebase"
 	]
 }
 
 WORK_EXPERIENCE = {
     'Transfix': {
-        'role': 'Data Scientist',
-        'duration': 'Jul 2023 - Jun 2024 · (1yr)',
-        'location': 'New York City, NY · Remote',
+        'role': 'Data Scientist II',
+        'duration': 'July 2023 - Present · (2yrs)',
+        'location': 'Austin, TX (Remote)',
         'img_path': 'images/transfix_logo.jpeg',
-        'description': """
-            - Authored the end-to-end development of a novel, bottom-up forecasting model to predict short-term trucking rates for 18,000+ market lanes.
-            - Refactored Transfix's core freight pricing algorithm to decrease win-rate bias by over 80%, enhancing model reliability and accuracy.
-            - Enhanced Transfix’s freight recommender platform by revising the recommendation algorithm to better serve new and infrequent users, reducing the number of empty recommendations by 45%.
-            - Leveraged Docker, GitHub, Airflow, AWS SageMaker, and other tools to manage, monitor, and deploy production models.
-        """
+        'description': "Pricing algorithms, forecasting, and recommender systems for freight markets 🚛"
     },
     'Dell Technologies': {
-        'role': 'Data Scientist',
-        'duration': 'Jun 2022 - July 2023 · (1yr)',
-        'location': 'Austin, TX · Hybrid',
+        'role': 'Data Scientist I',
+        'duration': 'June 2022 - July 2023 · (1yr)',
+        'location': 'Austin, TX',
         'img_path': 'images/dell_logo.jpeg',
-        'description': """
-            - Implemented a BERT model to automate the summarization and classification of customer service cases, saving support agents dozens of hours of manual analysis each week. Experimented with prompt engineering and fine-tuning on various LLM architectures including BART, GPT, and Longformer.
-            - Developed an ensemble classification model (Catboost + Autoregressor) to predict server backup failures from server logs, preemptively identifying potential failures and saving Dell approximately $1.2 million annually in compute costs.
-            - Forecasted product-level service requests using Prophet models, optimizing agent workload allocation, resulting in a 7% reduction in customer wait times.
-        """
+        'description': "Built Gen AI and Machine Learning models to automate case analysis, predict server failures, and optimize service forecasting."
     },
     'BarMonkey.io': {
         'role': 'Founder/Full Stack Developer',
-        'duration': 'Jul 2023 - Aug 2024',
-        'location': 'Austin, TX · Remote',
-        'img_path': 'images/barmonkey_logo.png',  # Update with the actual image path
-        'description': """
-            - Building a nightlife companion app that enables users to find local venues, connect with friends, and organize events.
-            - Designed and developed the UI/UX using Figma and Flutter while integrating Firebase for back-end infrastructure.
-            - Implemented secure user authentication, including OTP verification, with custom APIs built using Node.js, Express, and MongoDB.
-            - Developed dynamic geolocation features to recommend personalized venue suggestions based on user proximity and preferences.
-            - Scaled back-end architecture for deployment using Docker containers and AWS EC2, ensuring reliability and scalability.
-        """
+        'duration': 'Jul 2023 - Present',
+        'location': 'Remote',
+        'img_path': 'images/barmonkey_logo.png',
+        'description': "Building a nightlife companion app, enabling users to find local venues, connect with friends, and organize events."
     },
-    'Dell Technologies': {
-        'role': 'Data Science Intern (2x)',
-        'duration': 'June 2020 - Aug 2020 | May 2021 - Aug 2021 · (6 mos)',
-        'location': 'Austin, TX · Remote',
+    'Dell Technologies (Intern)': {
+        'role': 'Data Science Intern',
+        'duration': 'June - Aug 2020 | May - Aug 2021',
+        'location': 'Remote',
         'img_path': 'images/dell_logo.jpeg',
-        'description': """
-        - Implemented a Prophet model and supporting Streamlit app to forecast call-center demand for PowerEdge products.
-        - Developed an ensemble of Prophet, SARIMA, TBATs, and ETS time-series models to forecast repeat component dispatches.
-        """
+        'description': "Implemented a Prophet model and supporting Streamlit app to forecast call-center demand for PowerEdge products (first summer). Developed an ensemble of Prophet, SARIMA, TBATs, and ETS time-series models to forecast repeat component dispatches (second summer)."
     },
     'OnRamps': {
         'role': 'Data Science Intern',
-        'duration': 'Sep 2020 - April 2021 · (8 mos)',
-        'location': 'Austin, TX · Remote',
+        'duration': 'Sep 2020 - Apr 2021 · (8 mos)',
+        'location': 'Austin, TX',
         'img_path': 'images/onramps_logo.jpeg',
-        'description': """
-        - Automated auditing and analysis tasks with R scripts, saving 10+ hours of weekly manual analysis.
-        - Led a team to develop visualizations, dashboards, and researched API integration and ML-based forecasting approaches.
-        """
+        'description': "Automated auditing and analysis tasks with R scripts, saving 10+ hours of weekly manual analysis."
     }
-    
 }

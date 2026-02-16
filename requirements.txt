@@ -1,2 +1,0 @@
-Pillow==9.2.0
-st_social_media_links

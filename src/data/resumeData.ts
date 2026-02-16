@@ -1,4 +1,4 @@
-export const ABOUT = `Hey I'm Neel 👋🏽, a Data Scientist with 3+ years of experience based out of Austin, TX. I have a strong background in Math (B.S. UT Austin '22) and Computer Science (M.S. Georgia Tech '24), and I love building cool stuff with data 🤖.
+export const ABOUT = `Hey I'm Neel 👋🏽, a Senior ML Engineer with 4+ years of experience based out of Austin, TX. Currently at realtor.com building ML pipelines and ranking models. I have a strong background in Math (B.S. UT Austin '22) and Computer Science (M.S. Georgia Tech '24), and I love building cool stuff with data 🤖.
 
 My professional interests include Machine Learning, Data Science, Full Stack Dev, Cloud, and Startups 👨🏽‍💻.
 
@@ -8,13 +8,13 @@ export const EDUCATION = [
   {
     school: "Georgia Institute of Technology",
     degree: "MS Computer Science — Machine Learning Specialization",
-    year: "June 2024",
+    year: "2024",
     location: "Atlanta, GA (Remote)",
   },
   {
     school: "The University of Texas at Austin",
     degree: "BS Applied Mathematics | Minors in Computer Science and Statistics",
-    year: "December 2021",
+    year: "2022",
     location: "Austin, TX",
   },
 ];
@@ -22,46 +22,69 @@ export const EDUCATION = [
 export const SKILLS: Record<string, string[]> = {
   "Languages and Tools": ["Python", "SQL", "R"],
   "Data Analysis & Visualization": [
-    "NumPy", "Pandas", "Plotly/Dash", "Seaborn", "Streamlit", "Matplotlib", "Looker",
+    "NumPy",
+    "Pandas",
+    "Plotly/Dash",
+    "Seaborn",
+    "Streamlit",
+    "Matplotlib",
+    "Looker",
   ],
   "Machine Learning": [
-    "Scikit-Learn", "TensorFlow", "Keras", "PyTorch", "XGBoost", "LightGBM",
-    "NLTK", "spaCy", "MLFlow", "SHAP",
+    "Scikit-Learn",
+    "TensorFlow",
+    "Keras",
+    "PyTorch",
+    "XGBoost",
+    "LightGBM",
+    "Metaflow",
   ],
   "Data Science & Modeling": [
-    "Classification", "Regression", "Clustering", "Deep Learning", "Reinforcement Learning",
-    "Time Series Analysis", "NLP", "Bayesian Networks", "Dimensionality Reduction",
+    "Classification",
+    "Regression",
+    "Clustering",
+    "Deep Learning",
+    "Reinforcement Learning",
+    "Time Series Analysis",
+    "NLP",
+    "Bayesian Networks",
+    "Dimensionality Reduction",
     "Feature Engineering",
   ],
   Cloud: [
-    "AWS (Sagemaker, Bedrock, S3, EC2)", "Docker", "Airflow", "Supabase", "Firebase",
+    "AWS (Sagemaker, Bedrock, S3, EC2)",
+    "Snowflake",
+    "DBT",
+    "Docker",
+    "Airflow",
+    "Supabase",
   ],
 };
 
 export const WORK_EXPERIENCE = [
   {
+    company: "realtor.com",
+    role: "Senior Machine Learning Engineer",
+    duration: "August 2025 - Present",
+    location: "Austin, TX (Hybrid)",
+    description:
+      "Metaflow ML pipelines with Argo/Outerbounds CI/CD, XGBoost ranking for home search, AI-assisted coding tooling.",
+  },
+  {
     company: "Transfix",
     role: "Data Scientist II",
-    duration: "July 2023 - Present · (2yrs)",
+    duration: "July 2023 - August 2025",
     location: "Austin, TX (Remote)",
     description:
-      "Pricing algorithms, forecasting, and recommender systems for freight markets 🚛",
+      "Pricing algorithms, lane-level forecasting, recommender systems. Reduced win-rate bias 80%, improved engagement 45%.",
   },
   {
     company: "Dell Technologies",
     role: "Data Scientist I",
-    duration: "June 2022 - July 2023 · (1yr)",
+    duration: "June 2022 - July 2023",
     location: "Austin, TX",
     description:
-      "Built Gen AI and Machine Learning models to automate case analysis, predict server failures, and optimize service forecasting.",
-  },
-  {
-    company: "BarMonkey.io",
-    role: "Founder/Full Stack Developer",
-    duration: "Jul 2023 - Present",
-    location: "Remote",
-    description:
-      "Building a nightlife companion app, enabling users to find local venues, connect with friends, and organize events.",
+      "Ensemble model predicting server backup failures (~$1.2M/yr savings). BERT-based case summarization. Prophet demand forecasting.",
   },
   {
     company: "Dell Technologies (Intern)",
@@ -69,22 +92,18 @@ export const WORK_EXPERIENCE = [
     duration: "June - Aug 2020 | May - Aug 2021",
     location: "Remote",
     description:
-      "Implemented a Prophet model and supporting Streamlit app to forecast call-center demand for PowerEdge products (first summer). Developed an ensemble of Prophet, SARIMA, TBATs, and ETS time-series models to forecast repeat component dispatches (second summer).",
-  },
-  {
-    company: "OnRamps",
-    role: "Data Science Intern",
-    duration: "Sep 2020 - Apr 2021 · (8 mos)",
-    location: "Austin, TX",
-    description:
-      "Automated auditing and analysis tasks with R scripts, saving 10+ hours of weekly manual analysis.",
+      "Demand forecasting for 10+ enterprise products. Ensemble time-series models (Prophet, SARIMA, ETS) for operational accuracy.",
   },
 ];
 
 export const CONTACT = [
-  { label: "Email", value: "neel@example.com", link: "mailto:neel@example.com" },
-  { label: "LinkedIn", value: "linkedin.com/in/neel", link: "https://linkedin.com/in/neel" },
-  { label: "GitHub", value: "github.com/neel", link: "https://github.com/neel" },
+  { label: "Email", value: "neelpanging@live.com", link: "mailto:neelpanging@live.com" },
+  {
+    label: "LinkedIn",
+    value: "linkedin.com/in/neelpanging",
+    link: "https://linkedin.com/in/neelpanging",
+  },
+  { label: "GitHub", value: "github.com/neelpanging", link: "https://github.com/neelpanging" },
 ];
 
 export const ASCII_BANNER = `
@@ -94,10 +113,10 @@ export const ASCII_BANNER = `
 ║   ████╗  ██║██╔════╝██╔════╝██║                               ║
 ║   ██╔██╗ ██║█████╗  █████╗  ██║                               ║
 ║   ██║╚██╗██║██╔══╝  ██╔══╝  ██║                               ║
-║   ██║ ╚████║███████╗███████╗███████╗                           ║
+║   ██║ ╚████║███████╗███████╗███████╗                          ║
 ║   ╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝                          ║
 ║                                                               ║
-║   Data Scientist · ML Engineer · Builder                      ║
+║   Senior ML Engineer · Data Scientist · Builder               ║
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝\x1b[/cyan]
 
@@ -111,5 +130,6 @@ export const AVAILABLE_COMMANDS = [
   "skills",
   "experience",
   "contact",
+  "resume",
   "clear",
 ];

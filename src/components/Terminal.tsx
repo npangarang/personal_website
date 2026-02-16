@@ -83,7 +83,17 @@ function runCommand(cmd: string): string {
   \x1b[cmd:skills]skills\x1b[/cmd]      Technical skills by category
   \x1b[cmd:experience]experience\x1b[/cmd]  Work history
   \x1b[cmd:contact]contact\x1b[/cmd]     How to reach me
+  \x1b[cmd:resume]resume\x1b[/cmd]     Download resume (PDF)
   \x1b[cmd:clear]clear\x1b[/cmd]       Clear the terminal`;
+  }
+
+  if (c === "resume") {
+    return `
+\x1b[green]▸ Resume\x1b[/green]
+
+  \x1b[cmd:resume]Download resume (PDF)\x1b[/cmd]
+
+  Opening resume...`;
   }
 
   if (c === "about") {
@@ -141,7 +151,7 @@ interface Line {
 }
 
 // ── Placeholder suggestions ────────────────────────────────────
-const SUGGESTIONS = ["about", "education", "skills", "experience", "contact", "help"];
+const SUGGESTIONS = ["about", "education", "skills", "experience", "contact", "resume", "help"];
 
 function useCyclingSuggestion(active: boolean) {
   const [index, setIndex] = useState(0);
@@ -176,7 +186,7 @@ function useCyclingSuggestion(active: boolean) {
 }
 
 // ── Terminal component ─────────────────────────────────────────
-const COMMAND_CHIPS = ["about", "education", "skills", "experience", "contact"];
+const COMMAND_CHIPS = ["about", "education", "skills", "experience", "contact", "resume"];
 
 const Terminal: React.FC = () => {
   const [lines, setLines] = useState<Line[]>([
@@ -211,6 +221,16 @@ const Terminal: React.FC = () => {
   const executeCommand = useCallback((cmd: string) => {
     const trimmed = cmd.trim();
     setHasInteracted(true);
+
+    if (trimmed.toLowerCase() === "resume") {
+      const a = document.createElement("a");
+      a.href = "/resume.pdf";
+      a.download = "Neel_Panging_Resume.pdf";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
 
     if (trimmed === "clear") {
       setLines([]);

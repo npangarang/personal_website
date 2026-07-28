@@ -42,6 +42,65 @@
   color: #8b949e;
 }
 
+/* Group: title + agent sit together so the agent reads as part of the header
+   rather than an anchored right-edge widget. */
+.terminal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Invisible mirror of the left dots group so the title-group stays centered
+   under the space-between layout and the titlebar keeps its visual balance. */
+.terminal-titlebar-spacer {
+  width: 52px; /* 3 dots × 12px + 2 gaps × 8px */
+  flex-shrink: 0;
+}
+
+/* Agent-at-work slot — sits inline next to the title now, so no fixed width
+   or right-anchoring is required. */
+.terminal-agent-slot {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.agent-at-work {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  line-height: 1;
+  color: #00fff5;
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  background: none;
+  border: none;
+  display: inline-block;
+  user-select: none;
+  pointer-events: none;
+  animation: agent-breath 2.4s ease-in-out infinite;
+}
+
+@keyframes agent-breath {
+  0%, 100% { opacity: 0.65; }
+  50%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-at-work {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+/* On very narrow viewports the widget competes with the title for space;
+   drop it so the title remains readable. */
+@media (max-width: 420px) {
+  .terminal-agent-slot {
+    display: none;
+  }
+}
+
 /* Body */
 .terminal-body {
   flex: 1;
@@ -198,4 +257,88 @@
   border-radius: 10px;
   box-shadow: inset 0 0 60px rgba(0, 255, 245, 0.03);
   z-index: 5;
+}
+
+/* Header contact links — sit directly under the ASCII identity banner.
+   They replace the old `contact` command and use the same cyan/green
+   palette as the terminal accent and chip hover state. */
+.terminal-header-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 12px;
+  animation: terminal-header-links-reveal 0.5s ease-out both;
+}
+
+@keyframes terminal-header-links-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.terminal-header-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #1e2a3a;
+  background: rgba(0, 255, 245, 0.05);
+  color: #00fff5;
+  text-decoration: none;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.terminal-header-link:hover {
+  color: #39ff14;
+  background: rgba(0, 255, 245, 0.15);
+  border-color: #00fff5;
+  box-shadow: 0 0 12px rgba(0, 255, 245, 0.2);
+  transform: translateY(-1px);
+}
+
+.terminal-header-link:focus-visible {
+  outline: 2px dashed #00fff5;
+  outline-offset: 3px;
+}
+
+.terminal-header-link svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 420px) {
+  .terminal-header-links {
+    gap: 8px;
+  }
+  .terminal-header-link {
+    width: 26px;
+    height: 26px;
+  }
+  .terminal-header-link svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-header-links {
+    animation: none;
+  }
+  .terminal-header-link,
+  .terminal-header-link:hover {
+    transform: none;
+  }
 }

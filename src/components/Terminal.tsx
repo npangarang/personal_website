@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Mail, Linkedin, Github } from "lucide-react";
 import {
   ABOUT,
   EDUCATION,
   SKILLS,
   WORK_EXPERIENCE,
-  CONTACT,
+  CONTACT_LINKS,
   ASCII_BANNER,
+  HELP_HINT,
   AVAILABLE_COMMANDS,
 } from "@/data/resumeData";
 import TypewriterText from "./TypewriterText";
+import AgentAtWork from "./AgentAtWork";
 
 // ── Colour markup parser ───────────────────────────────────────
 function parseColour(
@@ -82,9 +85,10 @@ function runCommand(cmd: string): string {
   \x1b[cmd:education]education\x1b[/cmd]   My academic background
   \x1b[cmd:skills]skills\x1b[/cmd]      Technical skills by category
   \x1b[cmd:experience]experience\x1b[/cmd]  Work history
-  \x1b[cmd:contact]contact\x1b[/cmd]     How to reach me
   \x1b[cmd:resume]resume\x1b[/cmd]     Download resume (PDF)
-  \x1b[cmd:clear]clear\x1b[/cmd]       Clear the terminal`;
+  \x1b[cmd:clear]clear\x1b[/cmd]       Clear command history
+
+\x1b[green]Reach me:\x1b[/green] use the Email, LinkedIn, or GitHub icons in the header.`;
   }
 
   if (c === "resume") {
@@ -129,29 +133,24 @@ function runCommand(cmd: string): string {
     return out;
   }
 
-  if (c === "contact") {
-    let out = `\n\x1b[green]▸ Contact\x1b[/green]\n`;
-    CONTACT.forEach((ct) => {
-      out += `\n  \x1b[cyan]${ct.label}\x1b[/cyan]  ${ct.value}`;
-    });
-    return out + "\n";
-  }
-
   if (c === "") return "";
 
   return `zsh: command not found: ${cmd}`;
 }
 
 // ── Line type ──────────────────────────────────────────────────
+// Command input + output only. The ASCII banner, contact icon row,
+// and "Type help..." hint are persistent header chrome and are not
+// part of the lines buffer — `clear` only wipes this array.
 interface Line {
   id: number;
-  type: "input" | "output" | "banner";
+  type: "input" | "output";
   content: string;
   typing?: boolean;
 }
 
 // ── Placeholder suggestions ────────────────────────────────────
-const SUGGESTIONS = ["about", "education", "skills", "experience", "contact", "resume", "help"];
+const SUGGESTIONS = ["about", "education", "skills", "experience", "resume", "help"];
 
 function useCyclingSuggestion(active: boolean) {
   const [index, setIndex] = useState(0);
@@ -186,20 +185,46 @@ function useCyclingSuggestion(active: boolean) {
 }
 
 // ── Terminal component ─────────────────────────────────────────
-const COMMAND_CHIPS = ["about", "education", "skills", "experience", "contact", "resume"];
+const COMMAND_CHIPS = ["about", "education", "skills", "experience", "resume"];
+
+// Derive the contact label union from the data file so the icon map
+// is type-checked against the single source of truth. A misspelled
+// or missing key becomes a compile-time error instead of an `as`
+// cast that silently returns `undefined` at runtime. The value type
+// is taken from `typeof Mail` because `lucide-react` does not export
+// the `LucideIcon` type alias — but every icon in the package has
+// the same component shape, so a single concrete icon stands in.
+type ContactLabel = (typeof CONTACT_LINKS)[number]["label"];
+type LucideIcon = typeof Mail;
+
+const ICON_MAP = {
+  Email: Mail,
+  LinkedIn: Linkedin,
+  GitHub: Github,
+} satisfies Record<ContactLabel, LucideIcon>;
 
 const Terminal: React.FC = () => {
-  const [lines, setLines] = useState<Line[]>([
-    { id: 0, type: "banner", content: ASCII_BANNER, typing: true },
-  ]);
+  // Header chrome (banner, contact icons, Type-help hint) is rendered
+  // once at the top of the terminal body and is NOT part of `lines`.
+  // `clear` therefore only wipes this buffer; the chrome never
+  // remounts and never re-animates.
+  const [lines, setLines] = useState<Line[]>([]);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [histIdx, setHistIdx] = useState(-1);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [typingLineId, setTypingLineId] = useState<number | null>(0);
+  const [typingLineId, setTypingLineId] = useState<number | null>(null);
+  const [bannerTyped, setBannerTyped] = useState(false);
+  // The hint is the last element of the persistent header to finish
+  // typing (banner types → icons fade in → hint types). Gating all
+  // command entry points on `hintTyped` reproduces the prior
+  // `typingLineId = 0` lock for the full header animation. The icon
+  // row uses a 0.5s CSS fade — much shorter than the hint — so waiting
+  // on the hint covers it as well.
+  const [hintTyped, setHintTyped] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const idCounter = useRef(1);
+  const idCounter = useRef(0);
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -215,10 +240,20 @@ const Terminal: React.FC = () => {
     setLines((prev) =>
       prev.map((l) => (l.id === lineId ? { ...l, typing: false } : l))
     );
-    setTypingLineId(null);
+    // Only release the typing lock if it still references *this* line.
+    // A stale completion (e.g. an output line whose typewriter finally
+    // resolves after a newer output has already been started) must
+    // not wipe the lock the user is now waiting on.
+    setTypingLineId((current) => (current === lineId ? null : current));
   }, []);
 
   const executeCommand = useCallback((cmd: string) => {
+    // Lock every command entry point — the input form, the bottom
+    // chips, AND any clickable command chip in the header (e.g. the
+    // `help` link inside the partially-typed hint) — until the full
+    // persistent header has finished its initial animation.
+    if (!hintTyped) return;
+
     const trimmed = cmd.trim();
     setHasInteracted(true);
 
@@ -233,6 +268,8 @@ const Terminal: React.FC = () => {
     }
 
     if (trimmed === "clear") {
+      // Header chrome is persistent outside `lines`, so a clear is
+      // just an empty buffer. No remount, no re-animation.
       setLines([]);
       setHistory((h) => [...h, trimmed]);
       setHistIdx(-1);
@@ -254,11 +291,15 @@ const Terminal: React.FC = () => {
     if (outputLineId !== null) setTypingLineId(outputLineId);
     if (trimmed) setHistory((h) => [...h, trimmed]);
     setHistIdx(-1);
-  }, []);
+  }, [hintTyped]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (typingLineId !== null) return; // wait for current animation
+    // Block until the persistent header has finished its initial
+    // animation AND any in-flight output typewriter has resolved.
+    // Without the header guard, a user could submit (or chip-click)
+    // a command before the help hint has finished typing.
+    if (typingLineId !== null || !hintTyped) return;
     executeCommand(input);
     setInput("");
   };
@@ -308,15 +349,74 @@ const Terminal: React.FC = () => {
           <span className="terminal-dot" style={{ background: "#febc2e" }} />
           <span className="terminal-dot" style={{ background: "#28c840" }} />
         </div>
-        <span className="terminal-title">neel@portfolio ~ % zsh</span>
-        <div className="w-14" />
+        <div className="terminal-title-group">
+          <span className="terminal-title">neel@portfolio ~ % zsh</span>
+          <div className="terminal-agent-slot">
+            <AgentAtWork />
+          </div>
+        </div>
+        <div className="terminal-titlebar-spacer" aria-hidden="true" />
       </div>
 
       {/* Terminal body */}
       <div className="terminal-body">
+        {/* Persistent header chrome — mounts once, never re-mounted by
+            `clear`. Order is: ASCII identity banner → contact icon row
+            → "Type help..." hint. The contact nav and its links stop
+            click propagation so they don't steal focus from the
+            command input (the terminal-window below focuses on any
+            bubbled click). */}
+        <div className="terminal-line">
+          <pre className="terminal-output">
+            <TypewriterText
+              content={parseColour(ASCII_BANNER, executeCommand)}
+              speed={4}
+              onComplete={() => setBannerTyped(true)}
+            />
+          </pre>
+        </div>
+        {bannerTyped && (
+          <nav
+            className="terminal-header-links"
+            aria-label="Contact"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {CONTACT_LINKS.map((link) => {
+              const Icon = ICON_MAP[link.label];
+              const isExternal = link.link.startsWith("http");
+              return (
+                <a
+                  key={link.label}
+                  href={link.link}
+                  className="terminal-header-link"
+                  aria-label={`${link.label}: ${link.value}`}
+                  title={link.value}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Icon size={14} strokeWidth={1.75} aria-hidden="true" />
+                </a>
+              );
+            })}
+          </nav>
+        )}
+        {bannerTyped && (
+          <div className="terminal-line">
+            <pre className="terminal-output">
+              <TypewriterText
+                content={parseColour(HELP_HINT, executeCommand)}
+                speed={8}
+                onComplete={() => setHintTyped(true)}
+              />
+            </pre>
+          </div>
+        )}
+
+        {/* Command + output buffer — wiped by `clear`. */}
         {lines.map((line) => (
           <div key={line.id} className="terminal-line">
-            {line.type === "input" && (
+            {line.type === "input" ? (
               <div>
                 <span className="terminal-prompt">neel@portfolio</span>
                 <span style={{ color: "#00fff5" }}>:</span>
@@ -324,13 +424,12 @@ const Terminal: React.FC = () => {
                 <span style={{ color: "#00fff5" }}>$ </span>
                 <span>{line.content}</span>
               </div>
-            )}
-            {(line.type === "output" || line.type === "banner") && (
+            ) : (
               <pre className="terminal-output">
                 {line.typing ? (
                   <TypewriterText
                     content={parseColour(line.content, executeCommand)}
-                    speed={line.type === "banner" ? 4 : 8}
+                    speed={8}
                     onComplete={() => handleTypewriterComplete(line.id)}
                   />
                 ) : (
@@ -346,7 +445,7 @@ const Terminal: React.FC = () => {
           <span className="terminal-prompt">neel@portfolio</span>
           <span style={{ color: "#00fff5" }}>:</span>
           <span style={{ color: "#39ff14" }}>~</span>
-          <span style={{ color: "#00fff5" }}>$ </span>
+          <span style={{ color: "#00fff5" }}>$&nbsp;</span>
           <div className="terminal-input-wrapper">
             <input
               ref={inputRef}
@@ -356,7 +455,7 @@ const Terminal: React.FC = () => {
               className="terminal-input"
               autoFocus
               spellCheck={false}
-              autoComplete="off"
+              autoComplete="on"
             />
             {!hasInteracted && !input && suggestion && (
               <span className="terminal-suggestion">{suggestion}</span>
@@ -374,7 +473,7 @@ const Terminal: React.FC = () => {
             className="terminal-chip"
             onClick={(e) => {
               e.stopPropagation();
-              if (typingLineId !== null) return;
+              if (typingLineId !== null || !hintTyped) return;
               executeCommand(cmd);
             }}
           >

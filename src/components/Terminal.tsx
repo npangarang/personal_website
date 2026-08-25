@@ -6,12 +6,13 @@ import {
   SKILLS,
   WORK_EXPERIENCE,
   CONTACT_LINKS,
-  ASCII_BANNER,
   HELP_HINT,
   AVAILABLE_COMMANDS,
 } from "@/data/resumeData";
 import TypewriterText from "./TypewriterText";
 import AgentAtWork from "./AgentAtWork";
+import ParticleBackground from "./ParticleBackground";
+import AnimatedBanner from "./AnimatedBanner";
 
 // ── Colour markup parser ───────────────────────────────────────
 function parseColour(
@@ -342,6 +343,10 @@ const Terminal: React.FC = () => {
 
   return (
     <div className="terminal-window" onClick={focusInput}>
+      {/* Particle backdrop — clipped to the terminal frame by the
+          window's overflow: hidden, layered behind all content. */}
+      <ParticleBackground />
+
       {/* Title bar */}
       <div className="terminal-titlebar">
         <div className="flex gap-2">
@@ -367,13 +372,7 @@ const Terminal: React.FC = () => {
             command input (the terminal-window below focuses on any
             bubbled click). */}
         <div className="terminal-line">
-          <pre className="terminal-output">
-            <TypewriterText
-              content={parseColour(ASCII_BANNER, executeCommand)}
-              speed={4}
-              onComplete={() => setBannerTyped(true)}
-            />
-          </pre>
+          <AnimatedBanner onComplete={() => setBannerTyped(true)} />
         </div>
         {bannerTyped && (
           <nav

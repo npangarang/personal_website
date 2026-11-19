@@ -5,6 +5,7 @@ import {
   EDUCATION,
   SKILLS,
   WORK_EXPERIENCE,
+  PROJECTS,
   CONTACT_LINKS,
   HELP_HINT,
   AVAILABLE_COMMANDS,
@@ -22,7 +23,7 @@ function parseColour(
 ): React.ReactNode[] {
   const combined =
     // eslint-disable-next-line no-control-regex -- ESC is the terminal's intentional colour/command markup delimiter.
-    /\x1b\[cmd:(\w+)\]([\s\S]*?)\x1b\[\/cmd\]|\x1b\[(cyan|green|amber|bold)\]([\s\S]*?)\x1b\[\/\3\]/g;
+    /\x1b\[cmd:(\w+)\]([\s\S]*?)\x1b\[\/cmd\]|\x1b\[(cyan|green|amber|bold)\]([\s\S]*?)\x1b\[\/\3\]|\x1b\[url:([^\]]+)\]([\s\S]*?)\x1b\[\/url\]/g;
 
   const parts: React.ReactNode[] = [];
   let last = 0;
@@ -51,6 +52,21 @@ function parseColour(
         >
           {label}
         </span>,
+      );
+    } else if (match[5]) {
+      const href = match[5];
+      const label = match[6];
+      parts.push(
+        <a
+          key={key++}
+          href={href}
+          className="terminal-clickable-cmd"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {label}
+        </a>,
       );
     } else {
       const colour = match[3];
@@ -88,6 +104,7 @@ function runCommand(cmd: string): string {
   \x1b[cmd:education]education\x1b[/cmd]   My academic background
   \x1b[cmd:skills]skills\x1b[/cmd]      Technical skills by category
   \x1b[cmd:experience]experience\x1b[/cmd]  Work history
+  \x1b[cmd:projects]projects\x1b[/cmd]    Selected work
   \x1b[cmd:resume]resume\x1b[/cmd]     Download resume (PDF)
   \x1b[cmd:clear]clear\x1b[/cmd]       Clear command history
 
@@ -136,10 +153,25 @@ function runCommand(cmd: string): string {
     return out;
   }
 
+  if (c === "projects") {
+    let out = `\n\x1b[green]▸ Projects\x1b[/green]\n`;
+    PROJECTS.forEach((p) => {
+      out += `\n  \x1b[amber]${p.name}\x1b[/amber]\n`;
+      out += `  ${p.description}\n`;
+      out += `  \x1b[url:${p.link}]${p.label}\x1b[/url]\n`;
+    });
+    return out;
+  }
+
   if (c === "") return "";
 
   return `zsh: command not found: ${cmd}`;
 }
+
+// Exposed for the command/parser test contract without changing the
+// default Terminal export.
+// eslint-disable-next-line react-refresh/only-export-components -- pure helpers exported for unit tests, not components.
+export { parseColour, runCommand };
 
 // ── Line type ──────────────────────────────────────────────────
 // Command input + output only. The ASCII banner, contact icon row,
@@ -188,7 +220,7 @@ function useCyclingSuggestion(active: boolean) {
 }
 
 // ── Terminal component ─────────────────────────────────────────
-const COMMAND_CHIPS = ["about", "education", "skills", "experience", "resume"];
+const COMMAND_CHIPS = ["about", "education", "skills", "experience", "projects", "resume"];
 
 // Derive the contact label union from the data file so the icon map
 // is type-checked against the single source of truth. A misspelled

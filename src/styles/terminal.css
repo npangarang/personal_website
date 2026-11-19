@@ -44,6 +44,10 @@
 .terminal-title {
   font-size: 12px;
   color: #8b949e;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Group: title + agent sit together so the agent reads as part of the header
@@ -52,6 +56,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 /* Invisible mirror of the left dots group so the title-group stays centered
@@ -108,8 +113,21 @@
 /* Body */
 .terminal-body {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
+  /* Horizontal overflow is always a bug in this layout: the banner, prompt,
+     help text and chips are all designed to fit 320px. Hide any accidental
+     sub-pixel overflow instead of exposing a sideways scrollbar. */
+  overflow-x: hidden;
   padding: 16px;
+  /* Reserve the walker lane so the input/form never sits behind sprites.
+     PixelWalkers sets this variable from its measured scale; with walkers
+     disabled (reduced motion) the fallback is zero and the space is not
+     wasted. */
+  padding-bottom: calc(16px + var(--walker-strip-height, 0px));
+  /* Reserve the scrollbar gutter so the banner's measured content width does
+     not change (and flip variants) when content grows past the viewport. */
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: #1e2a3a transparent;
 }
@@ -143,7 +161,16 @@
    palette hues, no rainbow. The phosphor glow now lives on the
    per-character spans (see `.banner-char`) so it can be modulated
    per glyph. */
+.banner-frame {
+  min-width: 0;
+}
+
 .banner-art {
+  /* Box-drawing art must never wrap mid-line: a wrapped row breaks the
+     monospace alignment. The selected variant is measured to fit, so `pre`
+     only guards against pathological cases (very large accessibility text)
+     where clipping is still better than a shattered banner. */
+  white-space: pre;
   color: #00fff5;
   animation:
     banner-color 8s ease-in-out infinite,
@@ -263,6 +290,9 @@
     animation: none;
     text-shadow: 0 0 4px rgba(0, 255, 245, 0.25);
   }
+  .banner-chunk {
+    animation: none;
+  }
 }
 
 .terminal-prompt {
@@ -275,10 +305,12 @@
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .terminal-input-wrapper {
   flex: 1;
+  min-width: 0;
   position: relative;
 }
 
@@ -331,6 +363,73 @@
   border-top: 1px solid #1e2a3a;
   flex-wrap: wrap;
   z-index: 11;
+}
+
+/* Bottom dock = walker lane + chip bar. Keeping the chips in normal flow means
+   their wrapped height is measured by the browser; the walkers are absolutely
+   positioned immediately above the dock, so they can never overlap a multi-row
+   chip bar on narrow screens. */
+.terminal-bottom-dock {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 12;
+}
+
+/* Pixel walker lane. Height is written by PixelWalkers from its measured
+   scale; the same variable reserves space at the bottom of `.terminal-body`.
+   z-index 12 puts the sprites above `.scanline-overlay` (10). */
+.pixel-walkers {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: var(--walker-strip-height, 0px);
+  /* The strip itself is a fixed-height lane, but the engine can lift sprites
+     (small hops, spawn/fall arcs). Allow the lane to paint upward so a jump
+     is never decapitated, while clipping at the floor and at both edges:
+     falling sprites disappear at the floor instead of drawing on the chip bar.
+     `overflow` stays hidden as the fallback for browsers without clip-path. */
+  overflow: hidden;
+  clip-path: polygon(0 -240px, 100% -240px, 100% 100%, 0 100%);
+  pointer-events: none;
+  z-index: 12;
+}
+
+@supports (clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%)) {
+  .pixel-walkers {
+    overflow: visible;
+  }
+}
+
+/* Faint contact line so the sprites read as walking on the terminal floor. */
+.pixel-walkers::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 5px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 245, 0.18) 12%,
+    rgba(0, 255, 245, 0.18) 88%,
+    transparent
+  );
+}
+
+.pixel-walker {
+  position: absolute;
+  left: 0;
+  bottom: 6px;
+  will-change: transform;
+}
+
+.pixel-walker-sprite {
+  display: block;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  transform-origin: center;
 }
 
 .terminal-chip {
@@ -474,5 +573,21 @@
   .terminal-header-link,
   .terminal-header-link:hover {
     transform: none;
+  }
+}
+
+/* ── Small screens / touch ─────────────────────────────────────
+   iOS Safari zooms the page when a focused input computes below 16px.
+   Raise the whole active prompt line to 16px on phones and coarse pointers
+   (so the prompt, typed text and suggestion stay aligned), while desktop
+   stays at the terminal's 14px base size. This is a real font-size change,
+   not a transform trick. */
+@media (max-width: 640px), (pointer: coarse) {
+  .terminal-input-line {
+    font-size: 16px;
+  }
+
+  .terminal-input {
+    font-size: 16px;
   }
 }

@@ -13,6 +13,7 @@ import TypewriterText from "./TypewriterText";
 import AgentAtWork from "./AgentAtWork";
 import ParticleBackground from "./ParticleBackground";
 import AnimatedBanner from "./AnimatedBanner";
+import PixelWalkers from "./PixelWalkers";
 
 // ── Colour markup parser ───────────────────────────────────────
 function parseColour(
@@ -20,6 +21,7 @@ function parseColour(
   onCommand?: (cmd: string) => void,
 ): React.ReactNode[] {
   const combined =
+    // eslint-disable-next-line no-control-regex -- ESC is the terminal's intentional colour/command markup delimiter.
     /\x1b\[cmd:(\w+)\]([\s\S]*?)\x1b\[\/cmd\]|\x1b\[(cyan|green|amber|bold)\]([\s\S]*?)\x1b\[\/\3\]/g;
 
   const parts: React.ReactNode[] = [];
@@ -464,21 +466,26 @@ const Terminal: React.FC = () => {
         <div ref={bottomRef} />
       </div>
 
-      {/* Command chips */}
-      <div className="terminal-chips">
-        {COMMAND_CHIPS.map((cmd) => (
-          <button
-            key={cmd}
-            className="terminal-chip"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (typingLineId !== null || !hintTyped) return;
-              executeCommand(cmd);
-            }}
-          >
-            {cmd}
-          </button>
-        ))}
+      {/* Bottom dock: the walker lane floats above the chip bar, so wrapping
+          chips (phones) never collide with sprites. PixelWalkers reserves
+          matching clearance inside the scrollable body. */}
+      <div className="terminal-bottom-dock">
+        <PixelWalkers />
+        <div className="terminal-chips">
+          {COMMAND_CHIPS.map((cmd) => (
+            <button
+              key={cmd}
+              className="terminal-chip"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (typingLineId !== null || !hintTyped) return;
+                executeCommand(cmd);
+              }}
+            >
+              {cmd}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Scanline overlay */}

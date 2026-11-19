@@ -1,47 +1,123 @@
-import React from "react";
-import { ASCII_BANNER } from "@/data/resumeData";
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import TypewriterText from "./TypewriterText";
+import {
+  BANNER_ART,
+  findBannerArtLayout,
+  getBannerChunkIndex,
+  measureBannerCharWidth,
+  selectBannerVariant,
+  stripBannerMarkup,
+  type BannerVariantId,
+} from "@/lib/bannerLayout";
 
 // ── Animated ASCII identity banner (NEEL) ───────────────────────
 //
-// Renders the prominent ASCII-art header with the same typewriter
-// reveal as before. On top of the container-level colour sweep, each
-// visible glyph is wrapped in a `.banner-char` span and given a
-// negative, index-staggered delay so a soft shimmer wave travels
-// through the characters. The NEEL art is also divided into six large
-// regions which briefly glitch out and reassemble in sequence.
+// The banner has two artworks: the original 65-column desktop art and a
+// 30-column compact art for phones. Both use the same animation pipeline:
 //
-//   • Layout is preserved exactly — spans stay inline and only animate
-//     paint properties (opacity / text-shadow), never geometry, so the
-//     monospace grid and box-drawing glyphs stay aligned.
-//   • Whitespace (spaces / newlines) stays as raw text nodes so the
-//     typewriter's character counting and reveal are identical to the
-//     plain-text version, and the banner-complete callback fires the
-//     same way.
-//   • `prefers-reduced-motion: reduce` disables the per-char animation
-//     (see terminal.css) for a stable cyan fallback.
+//   • A typewriter reveal, unchanged from the original header.
+//   • A per-glyph shimmer wave (negative, index-staggered delay).
+//   • Larger “chunk” glitch bursts over the NEEL lettering. The chunk grid is
+//     derived from the actual block-glyph area of whichever art is mounted
+//     (see `findBannerArtLayout`), so the compact art is not animating a
+//     desktop-shaped grid.
+//
+// The variant is selected from the *measured* content-box width, not from
+// the viewport: the terminal is capped at 900px and has its own padding, so a
+// viewport breakpoint would pick the wrong art on tablets and zoomed text.
+//
+// ResizeObserver is preferred over a window-resize listener because the
+// terminal can change width for reasons other than the viewport (font swap,
+// scrollbar, future layout changes). It only reports box-size changes though,
+// so `document.fonts.ready` triggers one extra measurement after the
+// monospace webfont loads. Browsers without ResizeObserver fall back to the
+// window resize event.
+//
+// `prefers-reduced-motion: reduce` disables the shimmer/flicker in CSS for a
+// stable cyan banner. `onComplete` is guarded so a variant swap (rotation or
+// resize) can never unlock the header twice.
 
-const ESC = "\x1b"; // ANSI escape prefix used by the colour-markup tokens
-const STRIP_MARKUP = new RegExp(`${ESC}\\[[^\\]]*\\]`, "g");
-
-// Stagger between adjacent characters. Negative delays phase every
-// glyph immediately so the wave is visible the moment a glyph is
-// revealed, rather than ramping up from zero.
 const STEP_MS = 8;
-const CHUNK_STAGGER_MS = 1650;
-const ART_START_ROW = 3;
-const ART_END_ROW = 8;
-const ART_START_COLUMN = 4;
-const ART_COLUMNS_PER_CHUNK = 15;
-const ART_CHUNKS_PER_ROW = 3;
+const CHUNK_CYCLE_MS = 10_000;
 
 interface AnimatedBannerProps {
   onComplete?: () => void;
 }
 
 const AnimatedBanner: React.FC<AnimatedBannerProps> = ({ onComplete }) => {
-  const content = React.useMemo(() => {
-    const plain = ASCII_BANNER.replace(STRIP_MARKUP, "");
+  const [variant, setVariant] = useState<BannerVariantId | null>(null);
+  const [completed, setCompleted] = useState(false);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  const handleComplete = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    setCompleted(true);
+    onCompleteRef.current?.();
+  }, []);
+
+  useLayoutEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+
+    let disposed = false;
+    let resizeObserver: ResizeObserver | null = null;
+    let lastMeasuredWidth = -1;
+
+    const measure = (force = false) => {
+      if (disposed) return;
+      const availableWidth = frame.getBoundingClientRect().width;
+      // ResizeObserver also fires when the banner's height changes during the
+      // typewriter reveal. Width is what selects the art, so skip those extra
+      // layout reads; a font swap passes `force` because advance width can
+      // change without the box resizing.
+      if (!force && Math.abs(availableWidth - lastMeasuredWidth) < 0.5) return;
+      lastMeasuredWidth = availableWidth;
+
+      const charWidth = measureBannerCharWidth(frame);
+      const next = selectBannerVariant(availableWidth, charWidth);
+      setVariant((current) => (current === next ? current : next));
+    };
+
+    // Initial measurement runs in a layout effect, before the browser paints,
+    // so phones never flash the too-wide desktop banner first.
+    measure(true);
+
+    const onWindowResize = () => measure(true);
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => measure());
+      resizeObserver.observe(frame);
+    } else {
+      frame.ownerDocument.defaultView?.addEventListener("resize", onWindowResize);
+    }
+
+    let cancelled = false;
+    const fonts = frame.ownerDocument.fonts;
+    fonts?.ready
+      ?.then(() => {
+        if (!cancelled) measure(true);
+      })
+      ?.catch(() => {
+        // Font loading API is best-effort; the initial measurement still ran.
+      });
+
+    return () => {
+      disposed = true;
+      cancelled = true;
+      resizeObserver?.disconnect();
+      frame.ownerDocument.defaultView?.removeEventListener("resize", onWindowResize);
+    };
+  }, []);
+
+  const content = useMemo(() => {
+    if (!variant) return [];
+
+    const art = BANNER_ART[variant];
+    const plain = stripBannerMarkup(art);
+    const layout = findBannerArtLayout(art);
     let row = 0;
     let column = 0;
 
@@ -52,33 +128,27 @@ const AnimatedBanner: React.FC<AnimatedBannerProps> = ({ onComplete }) => {
         return ch;
       }
 
-      const isArtGlyph =
-        row >= ART_START_ROW &&
-        row <= ART_END_ROW &&
-        column >= ART_START_COLUMN &&
-        ch !== " ";
-      const chunk = isArtGlyph
-        ? Math.floor((row - ART_START_ROW) / 3) * ART_CHUNKS_PER_ROW +
-          Math.min(
-            ART_CHUNKS_PER_ROW - 1,
-            Math.floor((column - ART_START_COLUMN) / ART_COLUMNS_PER_CHUNK),
-          )
-        : null;
+      const chunk =
+        ch === " " ? null : getBannerChunkIndex(layout, row, column);
+      const chunkDelay =
+        chunk !== null && layout
+          ? (chunk * CHUNK_CYCLE_MS) / layout.totalChunks
+          : 0;
       const style = {
         "--char-delay": `-${i * STEP_MS}ms`,
         ...(chunk !== null && {
-          "--chunk-delay": `-${chunk * CHUNK_STAGGER_MS}ms`,
+          "--chunk-delay": `-${chunkDelay}ms`,
         }),
       } as React.CSSProperties;
 
       column += 1;
 
-      // Whitespace has no visible glyph to animate, so it stays a raw
-      // text node (and preserves the typewriter's char-by-char count).
+      // Whitespace stays a raw text node so the typewriter character count and
+      // the monospace layout match the plain source exactly.
       if (ch === " ") return ch;
       return (
         <span
-          key={i}
+          key={`${variant}-${i}`}
           className={chunk === null ? "banner-char" : "banner-char banner-chunk"}
           style={style}
         >
@@ -86,12 +156,32 @@ const AnimatedBanner: React.FC<AnimatedBannerProps> = ({ onComplete }) => {
         </span>
       );
     });
-  }, []);
+  }, [variant]);
 
   return (
-    <pre className="terminal-output banner-art">
-      <TypewriterText content={content} speed={4} onComplete={onComplete} />
-    </pre>
+    <div
+      ref={frameRef}
+      className="banner-frame"
+      data-banner-variant={variant ?? "pending"}
+    >
+      {variant && (
+        <pre
+          className={`terminal-output banner-art banner-art--${variant}`}
+          data-variant={variant}
+        >
+          {completed ? (
+            content
+          ) : (
+            <TypewriterText
+              key={variant}
+              content={content}
+              speed={4}
+              onComplete={handleComplete}
+            />
+          )}
+        </pre>
+      )}
+    </div>
   );
 };
 

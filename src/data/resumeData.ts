@@ -136,6 +136,22 @@ export const ASCII_BANNER = `
 ╚═══════════════════════════════════════════════════════════════╝\x1b[/cyan]
 `;
 
+// Small-screen identity banner. Unlike the full art this starts on the
+// box border (no leading blank line) to save vertical space above the fold.
+// Every line is exactly 30 visible columns, including the box, so the
+// mono grid stays aligned when the typewriter reveals it.
+export const ASCII_BANNER_COMPACT = `\x1b[cyan]╔════════════════════════════╗
+║                            ║
+║  ██   █ █████ █████ ██     ║
+║  ███  █ ██    ██    ██     ║
+║  ██ █ █ ████  ████  ██     ║
+║  ██  ██ ██    ██    ██     ║
+║  ██   █ █████ █████ █████  ║
+║                            ║
+║   ML Engineer · Builder    ║
+║                            ║
+╚════════════════════════════╝\x1b[/cyan]`;
+
 // Renders as its own line below the icon row, with its own typewriter
 // pass, so the contact icons visibly sit *between* the banner and the
 // "Type help..." prompt.

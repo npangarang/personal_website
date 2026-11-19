@@ -1,0 +1,124 @@
+{
+  "note": "All art is \u00a9 Nintendo / Creatures Inc. / GAME FREAK inc. (trainer sheets) and \u00a9 Nintendo (Mario/Goomba), used as non-commercial fan art on a personal site. Originals are pinned below; sheets in this directory are reformatted (RGBA, re-gridded) copies of those originals.",
+  "trainer_source": {
+    "repo": "pret/pokefirered",
+    "commit": "ce6406d8c2eaf46d543c8a2606de0c3cb1951982",
+    "path_pattern": "graphics/object_events/pics/people/<name>.png"
+  },
+  "smb_source": {
+    "site": "Super Mario Wiki (mariowiki.com) file pages, rips of the original NES game",
+    "files": {
+      "SMB_NES_Mario_Walking_Sprite.gif": "https://www.mariowiki.com/File:SMB_NES_Mario_Walking_Sprite.gif",
+      "SMB_Super_Mario_Jumping.png": "https://www.mariowiki.com/File:SMB_Super_Mario_Jumping.png",
+      "SMB_Goomba_Sprite.gif": "https://www.mariowiki.com/File:SMB_Goomba_Sprite.gif",
+      "SMB_Dead_Goomba.png": "https://www.mariowiki.com/File:SMB_Dead_Goomba.png"
+    }
+  },
+  "sheets": {
+    "mario.png": {
+      "size": [
+        64,
+        32
+      ],
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": {
+        "walk": [
+          0,
+          1,
+          2
+        ],
+        "jump": 3
+      },
+      "originals": {
+        "SMB_NES_Mario_Walking_Sprite.gif": "c3d23565f07afb4749686db3cb29e7fffa0e0dfa6272da00b264e4da7bb219c6",
+        "SMB_Super_Mario_Jumping.png": "38c68d6975b71778fa96c8cf20e6a3eb22913c49887d6a53a2e71aaf23e71c87"
+      }
+    },
+    "goomba.png": {
+      "size": [
+        48,
+        16
+      ],
+      "frame_w": 16,
+      "frame_h": 16,
+      "frames": {
+        "walk": [
+          0,
+          1
+        ],
+        "squash": 2
+      },
+      "originals": {
+        "SMB_Goomba_Sprite.gif": "94f7158cf45aeb215266eb6dd1d636c259da3273e7448789f05e5d8c97c9b562",
+        "SMB_Dead_Goomba.png": "551eaf97d49730de5304c1651fa354db780fa72dd711d30e62bbecf18e0bc97b"
+      }
+    },
+    "red.png": {
+      "size": [
+        144,
+        32
+      ],
+      "frame_w": 16,
+      "frame_h": 32,
+      "layout": "9 frames: down/up/left idles (0/1/2), down steps (3/4), up steps (5/6), left steps (7/8); right = mirrored left",
+      "source_url": "https://raw.githubusercontent.com/pret/pokefirered/ce6406d8c2eaf46d543c8a2606de0c3cb1951982/graphics/object_events/pics/people/red_normal.png",
+      "original_sha256": "94eb37499a8bd663f47a0767c34b93569cf0c222a9906852943016e3a771054d"
+    },
+    "blue.png": {
+      "size": [
+        144,
+        32
+      ],
+      "frame_w": 16,
+      "frame_h": 32,
+      "layout": "9 frames: down/up/left idles (0/1/2), down steps (3/4), up steps (5/6), left steps (7/8); right = mirrored left",
+      "source_url": "https://raw.githubusercontent.com/pret/pokefirered/ce6406d8c2eaf46d543c8a2606de0c3cb1951982/graphics/object_events/pics/people/blue.png",
+      "original_sha256": "2b66b767e56237d811ad83585f7b6a8732f73efd8d8406069e07322d36d791fb"
+    },
+    "prof_oak.png": {
+      "size": [
+        144,
+        32
+      ],
+      "frame_w": 16,
+      "frame_h": 32,
+      "layout": "9 frames: down/up/left idles (0/1/2), down steps (3/4), up steps (5/6), left steps (7/8); right = mirrored left",
+      "source_url": "https://raw.githubusercontent.com/pret/pokefirered/ce6406d8c2eaf46d543c8a2606de0c3cb1951982/graphics/object_events/pics/people/prof_oak.png",
+      "original_sha256": "9ac53f6e5615d0cc4f78da06dd03c3d62808d60e634f051deaf3152411f83599"
+    },
+    "giovanni.png": {
+      "size": [
+        144,
+        32
+      ],
+      "frame_w": 16,
+      "frame_h": 32,
+      "layout": "9 frames: down/up/left idles (0/1/2), down steps (3/4), up steps (5/6), left steps (7/8); right = mirrored left",
+      "source_url": "https://raw.githubusercontent.com/pret/pokefirered/ce6406d8c2eaf46d543c8a2606de0c3cb1951982/graphics/object_events/pics/people/giovanni.png",
+      "original_sha256": "fa7cc4b067c0dc5271af3832dcb2353edeb8ed51b0a2b279de462265a1ec50d2"
+    },
+    "lorelei.png": {
+      "size": [
+        144,
+        32
+      ],
+      "frame_w": 16,
+      "frame_h": 32,
+      "layout": "9 frames: down/up/left idles (0/1/2), down steps (3/4), up steps (5/6), left steps (7/8); right = mirrored left",
+      "source_url": "https://raw.githubusercontent.com/pret/pokefirered/ce6406d8c2eaf46d543c8a2606de0c3cb1951982/graphics/object_events/pics/people/lorelei.png",
+      "original_sha256": "4f2d6bec56c2ae56e894a264fa10bd45e0279681fd7945714088e699dd40b805"
+    },
+    "rocket_m.png": {
+      "size": [
+        144,
+        32
+      ],
+      "frame_w": 16,
+      "frame_h": 32,
+      "layout": "9 frames: down/up/left idles (0/1/2), down steps (3/4), up steps (5/6), left steps (7/8); right = mirrored left",
+      "source_url": "https://raw.githubusercontent.com/pret/pokefirered/ce6406d8c2eaf46d543c8a2606de0c3cb1951982/graphics/object_events/pics/people/rocket_m.png",
+      "original_sha256": "df9978edee318b6193fc85be4a88fa85202bbd6e689bb21e602c181dab3b6e12"
+    }
+  }
+}

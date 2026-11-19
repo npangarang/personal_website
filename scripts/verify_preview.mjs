@@ -53,14 +53,14 @@ const FONT_WAIT = 5_000;
 const RUN_SCENE = process.env.VERIFY_SCENE !== '0';
 // Natural dimensions of the authored sprite sheets in /sprites.
 const SPRITE_DIMENSIONS = {
-  'brendan.png': [144, 32],
-  'may.png': [144, 32],
-  'hiker.png': [144, 32],
-  'lass.png': [144, 32],
-  'picnicker.png': [144, 32],
-  'sailor.png': [144, 32],
-  'mario.png': [48, 16],
-  'goomba.png': [16, 16],
+  'red.png': [144, 32],
+  'blue.png': [144, 32],
+  'prof_oak.png': [144, 32],
+  'giovanni.png': [144, 32],
+  'lorelei.png': [144, 32],
+  'rocket_m.png': [144, 32],
+  'mario.png': [64, 32],
+  'goomba.png': [48, 16],
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -675,12 +675,20 @@ const SCENE = String.raw`(() => {
     const raw = el.style.backgroundImage || style.backgroundImage || '';
     const match = raw.match(/url\((?:"|')?([^"')]+)(?:"|')?\)/);
     const r = el.getBoundingClientRect();
+    // The component positions frames by background-position at
+    // -frame * 16 * scale px; the rendered cell width is 16 * scale.
+    const backgroundPosition = el.style.backgroundPosition || style.backgroundPosition || '';
+    const bgX = backgroundPosition.match(/-?(?:\d+|\d*\.\d+)px/);
+    const frame = bgX && r.width > 0 ? Math.round(-parseFloat(bgX[0]) / r.width) : null;
     return {
       src: match ? match[1] : null,
       top: r.top,
+      bottom: r.bottom,
       left: r.left,
       width: r.width,
       height: r.height,
+      frame,
+      backgroundPosition,
       transform: el.style.transform || '',
       computedTransform: style.transform,
       rootTransform: root.style.transform || '',
@@ -1086,7 +1094,8 @@ async function runScene(page) {
   metrics.scene = record;
   if (!RUN_SCENE) return;
 
-  let lastGoombaTop = null;
+  let lastSquash = null;
+  let stationarySamples = 0;
   let absent = 0;
   const started = Date.now();
   try {
@@ -1102,6 +1111,7 @@ async function runScene(page) {
       const goomba = state.sprites.find((sprite) => /goomba\.png(?:\?|$)/.test(sprite.src || ''));
       if (mario && !record.events.mario) record.events.mario = Date.now() - started;
       if (goomba && !record.events.goomba) record.events.goomba = Date.now() - started;
+      if (mario && mario.frame === 3) record.events.hop ??= Date.now() - started;
 
       if (mario && goomba && mario.visible && goomba.visible && !record.evidence.chase) {
         const capture = { at: Date.now() - started, mario, goomba };
@@ -1115,43 +1125,48 @@ async function runScene(page) {
         record.evidence.chase = capture;
       }
 
-      if (goomba) {
-        absent = 0;
-        const flipped =
-          /scaleY\(-1\)/.test(goomba.transform) ||
-          /scaleY\(-1\)/.test(goomba.computedTransform);
-        if (flipped) {
-          record.events.flipped ??= Date.now() - started;
-          if (!record.evidence.stomp) {
-            const capture = { at: Date.now() - started, mario, goomba };
-            const file = path.join(OUT, 'mario-stomp-768.png');
-            const shot = await page.capture(file);
-            capture.path = path.relative(ROOT, file);
-            capture.size = { width: shot.width, height: shot.height };
-            if (shot.width !== 768 || shot.height !== HEIGHT) {
-              metrics.warnings.push(`mario-stomp-768.png is ${shot.width}x${shot.height}`);
-            }
-            record.evidence.stomp = capture;
-          }
-          if (lastGoombaTop !== null && goomba.top > lastGoombaTop + 0.5) {
-            record.events.fell ??= Date.now() - started;
-          }
-          lastGoombaTop = goomba.top;
+      if (goomba && goomba.frame === 2) {
+        record.events.squash ??= Date.now() - started;
+        const held =
+          lastSquash &&
+          Math.abs(goomba.left - lastSquash.left) < 0.5 &&
+          Math.abs(goomba.bottom - lastSquash.bottom) < 0.5;
+        stationarySamples = held ? stationarySamples + 1 : 1;
+        if (stationarySamples >= 2) {
+          record.events.linger ??= Date.now() - started;
         }
-      } else if (record.events.flipped) {
-        absent += 1;
-        if (absent >= 2) {
-          record.events.removed = Date.now() - started;
-          break;
+        lastSquash = { left: goomba.left, bottom: goomba.bottom };
+
+        if (record.events.linger && !record.evidence.stomp) {
+          const capture = { at: Date.now() - started, mario, goomba };
+          const file = path.join(OUT, 'mario-stomp-768.png');
+          const shot = await page.capture(file);
+          capture.path = path.relative(ROOT, file);
+          capture.size = { width: shot.width, height: shot.height };
+          if (shot.width !== 768 || shot.height !== HEIGHT) {
+            metrics.warnings.push(`mario-stomp-768.png is ${shot.width}x${shot.height}`);
+          }
+          record.evidence.stomp = capture;
+        }
+        absent = 0;
+      } else {
+        lastSquash = null;
+        stationarySamples = 0;
+        if (!goomba && record.events.squash) {
+          absent += 1;
+          if (absent >= 2) {
+            record.events.removed ??= Date.now() - started;
+            break;
+          }
         }
       }
-      await sleep(50);
+      await sleep(record.events.squash && !record.events.removed ? 20 : 50);
     }
 
     const events = record.events;
     const complete =
-      events.mario && events.goomba && events.flipped && events.fell && events.removed;
-    const any = events.mario || events.goomba || events.flipped;
+      events.hop && events.squash && events.linger && events.removed;
+    const any = events.mario || events.goomba || events.hop || events.squash;
     record.status = complete ? 'observed' : any ? 'partial' : 'not-observed';
     record.wallMs = Date.now() - started;
     if (record.status !== 'observed') {

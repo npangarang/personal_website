@@ -6,9 +6,8 @@
 // sheet frame they are showing and which way they face.
 //
 // Coordinates are *logical base pixels*: `x` is the sprite's left edge and `y`
-// is lift above the floor (negative while falling below it). The component
-// divides its CSS width by the current display scale before calling us, so the
-// simulation is resolution-independent.
+// is lift above the floor. The component divides its CSS width by the current
+// display scale before calling us, so the simulation is resolution-independent.
 //
 // `stepWalkerWorld` is pure: it deep-copies the world, advances a local copy and
 // returns it. The caller's world (and anything it returned to the renderer) is
@@ -18,18 +17,20 @@ export const WALKER_FRAME_MS = 133;
 export const WALKER_MAX_ACTORS = 3;
 export const WALKER_SCENE_MIN_DELAY_MS = 45_000;
 export const WALKER_SCENE_MAX_DELAY_MS = 120_000;
+/** How long a stomped Goomba stays flattened before it despawns. */
+export const WALKER_GOOMBA_SQUASH_LINGER_MS = 700;
 
 /** Trainer sheets are 144×32: nine 16×32 frames laid out horizontally. */
 export const WALKER_TRAINER_FRAME_WIDTH = 16;
 export const WALKER_TRAINER_FRAME_HEIGHT = 32;
 
 export type WalkerKind =
-  | "brendan"
-  | "may"
-  | "hiker"
-  | "lass"
-  | "picnicker"
-  | "sailor"
+  | "red"
+  | "blue"
+  | "prof_oak"
+  | "giovanni"
+  | "lorelei"
+  | "rocket_m"
   | "mario"
   | "goomba";
 
@@ -42,12 +43,11 @@ export interface WalkerSprite {
   y: number;
   frame: number;
   facing: WalkerFacing;
-  flipped: boolean;
 }
 
 type TrainerKind = Extract<
   WalkerKind,
-  "brendan" | "may" | "hiker" | "lass" | "picnicker" | "sailor"
+  "red" | "blue" | "prof_oak" | "giovanni" | "lorelei" | "rocket_m"
 >;
 
 type Direction = -1 | 1;
@@ -65,16 +65,19 @@ interface TrainerActor {
   pauseRemainingMs: number;
 }
 
+type GoombaState = "walking" | "squashed";
+
 interface GoombaActor {
   role: "goomba";
   kind: "goomba";
   id: number;
   x: number;
   y: number;
-  vy: number;
   dir: Direction;
   speed: number;
-  flipped: boolean;
+  walkMs: number;
+  state: GoombaState;
+  squashRemainingMs: number;
 }
 
 type MarioPhase = "chase" | "jump" | "walk";
@@ -127,17 +130,23 @@ const TRAINER_IDLE_UP_FRAME = 1;
 // down idle 0, up walk [5, 1, 6, 1] with up idle 1.
 
 const TRAINER_KINDS: readonly TrainerKind[] = [
-  "brendan",
-  "may",
-  "hiker",
-  "lass",
-  "picnicker",
-  "sailor",
+  "red",
+  "blue",
+  "prof_oak",
+  "giovanni",
+  "lorelei",
+  "rocket_m",
 ];
 
-// Mario's sheet has three frames (left stride, together, right stride). Bounce
-// back through the middle frame so the walk does not skip from right to left.
-const MARIO_WALK_FRAMES = [0, 1, 2, 1] as const;
+// Mario's sheet uses frames 0–2 in their original walking-cycle order and
+// frame 3 for the jump. Every hop renders frame 3.
+const MARIO_WALK_FRAMES = [0, 1, 2] as const;
+const MARIO_JUMP_FRAME = 3;
+
+// The Goomba's two walking frames alternate on the same 133ms cadence; frame 2
+// is the flattened pose it holds after a stomp.
+const GOOMBA_WALK_FRAMES = [0, 1] as const;
+const GOOMBA_SQUASH_FRAME = 2;
 
 const TRAINER_SPEED_MIN = 12;
 const TRAINER_SPEED_MAX = 18;
@@ -161,9 +170,6 @@ const MIN_JUMP_RUNWAY = 24;
 const STOMP_HEIGHT = 16;
 const JUMP_VELOCITY = 150;
 const GRAVITY = 360;
-const FLIP_VELOCITY = 70;
-const FLIP_GRAVITY = 420;
-const FLIP_REMOVE_Y = -32;
 
 const MAX_SUBSTEP_MS = 32;
 const MAX_TIME_MS = 24 * 60 * 60 * 1_000;
@@ -301,10 +307,11 @@ function startScene(world: WalkerWorld, rng?: () => number): void {
     id: world.nextId++,
     x: dir === 1 ? -SPRITE_WIDTH : world.width,
     y: 0,
-    vy: 0,
     dir,
     speed: goombaSpeed,
-    flipped: false,
+    walkMs: 0,
+    state: "walking",
+    squashRemainingMs: 0,
   };
 
   world.actors.push(goomba);
@@ -449,11 +456,15 @@ function advanceScene(
 
   // The Goomba is already on its way before Mario enters.
   if (goomba) {
-    if (goomba.flipped) {
-      goomba.vy -= FLIP_GRAVITY * seconds;
-      goomba.y += goomba.vy * seconds;
+    if (goomba.state === "squashed") {
+      // Frozen on the floor where Mario stomped it, counting down its linger.
+      goomba.squashRemainingMs = Math.max(
+        0,
+        goomba.squashRemainingMs - deltaMs,
+      );
     } else {
       goomba.x += scene.dir * goomba.speed * seconds;
+      goomba.walkMs += deltaMs;
     }
   }
 
@@ -482,7 +493,7 @@ function advanceScene(
     mario.x += scene.dir * mario.speed * seconds;
     mario.walkMs += deltaMs;
 
-    if (goomba && !goomba.flipped) {
+    if (goomba && goomba.state === "walking") {
       let gap = horizontalGap(mario, goomba);
 
       // Never let the chase become a head-on overlap. If a resize or a very
@@ -516,7 +527,7 @@ function advanceScene(
 
     if (
       goomba &&
-      !goomba.flipped &&
+      goomba.state === "walking" &&
       !mario.stomped &&
       mario.vy < 0 &&
       previousY > STOMP_HEIGHT &&
@@ -527,10 +538,12 @@ function advanceScene(
         Math.max(mario.x, goomba.x);
 
       if (overlap >= 2) {
-        // A genuine descending stomp: flip the Goomba, snap Mario onto its top
-        // for one clean frame, then let both fall naturally.
-        goomba.flipped = true;
-        goomba.vy = FLIP_VELOCITY;
+        // A genuine descending stomp: freeze the Goomba flat on the floor for
+        // its linger, snap Mario onto its top for one clean frame, then let
+        // Mario land and walk on.
+        goomba.state = "squashed";
+        goomba.y = 0;
+        goomba.squashRemainingMs = WALKER_GOOMBA_SQUASH_LINGER_MS;
         mario.stomped = true;
         mario.y = STOMP_HEIGHT;
       }
@@ -552,11 +565,10 @@ function advanceScene(
 }
 
 function actorHasExited(actor: WalkerActor, width: number): boolean {
-  if (actor.role === "trainer" || actor.role === "mario") {
-    return actor.dir === 1 ? actor.x >= width : actor.x + SPRITE_WIDTH <= 0;
+  if (actor.role === "goomba" && actor.state === "squashed") {
+    // A squashed Goomba is stationary; only its linger timer removes it.
+    return actor.squashRemainingMs <= 0;
   }
-
-  if (actor.flipped) return actor.y < FLIP_REMOVE_Y;
   return actor.dir === 1 ? actor.x >= width : actor.x + SPRITE_WIDTH <= 0;
 }
 
@@ -652,9 +664,17 @@ function trainerFrame(trainer: TrainerActor): number {
 }
 
 function marioFrame(mario: MarioActor): number {
+  if (mario.phase === "jump") return MARIO_JUMP_FRAME;
   const index =
     Math.floor(mario.walkMs / WALKER_FRAME_MS) % MARIO_WALK_FRAMES.length;
   return MARIO_WALK_FRAMES[index];
+}
+
+function goombaFrame(goomba: GoombaActor): number {
+  if (goomba.state === "squashed") return GOOMBA_SQUASH_FRAME;
+  const index =
+    Math.floor(goomba.walkMs / WALKER_FRAME_MS) % GOOMBA_WALK_FRAMES.length;
+  return GOOMBA_WALK_FRAMES[index];
 }
 
 function facingForActor(actor: WalkerActor): WalkerFacing {
@@ -665,7 +685,7 @@ function facingForActor(actor: WalkerActor): WalkerFacing {
 function frameForActor(actor: WalkerActor): number {
   if (actor.role === "trainer") return trainerFrame(actor);
   if (actor.role === "mario") return marioFrame(actor);
-  return 0;
+  return goombaFrame(actor);
 }
 
 function spriteForActor(actor: WalkerActor): WalkerSprite {
@@ -676,7 +696,6 @@ function spriteForActor(actor: WalkerActor): WalkerSprite {
     y: actor.role === "trainer" ? 0 : actor.y,
     frame: frameForActor(actor),
     facing: facingForActor(actor),
-    flipped: actor.role === "goomba" ? actor.flipped : false,
   };
 }
 

@@ -4,6 +4,7 @@ import {
   getWalkerSprites,
   stepWalkerWorld,
 } from "@/lib/pixelWalkers";
+import type { WalkerKind } from "@/lib/pixelWalkers";
 
 // ── Terminal walkers ───────────────────────────────────────────
 //
@@ -48,28 +49,28 @@ const TRAINER_META: Omit<SpriteMeta, "src"> = {
   frames: TRAINER_FRAMES,
 };
 
-const SPRITE_META: Record<string, SpriteMeta> = {
-  brendan: { src: "/sprites/brendan.png", ...TRAINER_META },
-  may: { src: "/sprites/may.png", ...TRAINER_META },
-  hiker: { src: "/sprites/hiker.png", ...TRAINER_META },
-  lass: { src: "/sprites/lass.png", ...TRAINER_META },
-  picnicker: { src: "/sprites/picnicker.png", ...TRAINER_META },
-  sailor: { src: "/sprites/sailor.png", ...TRAINER_META },
+const SPRITE_META: Record<WalkerKind, SpriteMeta> = {
+  red: { src: "/sprites/red.png", ...TRAINER_META },
+  blue: { src: "/sprites/blue.png", ...TRAINER_META },
+  prof_oak: { src: "/sprites/prof_oak.png", ...TRAINER_META },
+  giovanni: { src: "/sprites/giovanni.png", ...TRAINER_META },
+  lorelei: { src: "/sprites/lorelei.png", ...TRAINER_META },
+  rocket_m: { src: "/sprites/rocket_m.png", ...TRAINER_META },
   mario: {
     src: "/sprites/mario.png",
+    sheetWidth: 64,
+    sheetHeight: 32,
+    frameWidth: 16,
+    frameHeight: 32,
+    frames: 4,
+  },
+  goomba: {
+    src: "/sprites/goomba.png",
     sheetWidth: 48,
     sheetHeight: 16,
     frameWidth: 16,
     frameHeight: 16,
     frames: 3,
-  },
-  goomba: {
-    src: "/sprites/goomba.png",
-    sheetWidth: 16,
-    sheetHeight: 16,
-    frameWidth: 16,
-    frameHeight: 16,
-    frames: 1,
   },
 };
 
@@ -87,11 +88,10 @@ type WalkerSprite = ReturnType<typeof getWalkerSprites>[number];
 interface WalkerNode {
   root: HTMLDivElement;
   sprite: HTMLDivElement;
-  kind: string;
+  kind: WalkerKind;
   scale: number;
   frame: number;
   mirrored: boolean;
-  flipped: boolean;
   position: string;
 }
 
@@ -117,10 +117,6 @@ function isMirrored(sprite: WalkerSprite): boolean {
   if (sprite.kind === "goomba") return false;
   // Trainer sheets are drawn facing left; up/down poses are not mirrored.
   return sprite.facing === "right";
-}
-
-function isUpsideDown(sprite: WalkerSprite): boolean {
-  return sprite.kind === "goomba" && sprite.flipped;
 }
 
 const PixelWalkers: React.FC = () => {
@@ -190,7 +186,6 @@ const PixelWalkers: React.FC = () => {
         scale: -1,
         frame: -1,
         mirrored: false,
-        flipped: false,
         position: "",
       };
     };
@@ -212,7 +207,6 @@ const PixelWalkers: React.FC = () => {
 
       for (const sprite of sprites) {
         const meta = SPRITE_META[sprite.kind];
-        if (!meta) continue;
         seen.add(sprite.id);
 
         let node = nodes.get(sprite.id);
@@ -236,15 +230,9 @@ const PixelWalkers: React.FC = () => {
         }
 
         const mirrored = isMirrored(sprite);
-        const flipped = isUpsideDown(sprite);
-        if (node.mirrored !== mirrored || node.flipped !== flipped) {
-          const transforms = [
-            mirrored ? "scaleX(-1)" : "",
-            flipped ? "scaleY(-1)" : "",
-          ].filter(Boolean);
-          node.sprite.style.transform = transforms.join(" ") || "none";
+        if (node.mirrored !== mirrored) {
+          node.sprite.style.transform = mirrored ? "scaleX(-1)" : "none";
           node.mirrored = mirrored;
-          node.flipped = flipped;
         }
 
         const x = Math.round(sprite.x * scale);

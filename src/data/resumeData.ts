@@ -136,10 +136,62 @@ export const ASCII_BANNER = `
 ╚═══════════════════════════════════════════════════════════════╝\x1b[/cyan]
 `;
 
+// Small-screen identity banner. Unlike the full art this starts on the
+// box border (no leading blank line) to save vertical space above the fold.
+// Every line is exactly 30 visible columns, including the box, so the
+// mono grid stays aligned when the typewriter reveals it.
+export const ASCII_BANNER_COMPACT = `\x1b[cyan]╔════════════════════════════╗
+║                            ║
+║  ██   █ █████ █████ ██     ║
+║  ███  █ ██    ██    ██     ║
+║  ██ █ █ ████  ████  ██     ║
+║  ██  ██ ██    ██    ██     ║
+║  ██   █ █████ █████ █████  ║
+║                            ║
+║   ML Engineer · Builder    ║
+║                            ║
+╚════════════════════════════╝\x1b[/cyan]`;
+
 // Renders as its own line below the icon row, with its own typewriter
 // pass, so the contact icons visibly sit *between* the banner and the
 // "Type help..." prompt.
 export const HELP_HINT = `Type \x1b[cmd:help]help\x1b[/cmd] to see available commands.`;
+
+export interface Project {
+  name: string;
+  description: string;
+  link: string;
+  label: string;
+}
+
+export const PROJECTS: Project[] = [
+  {
+    name: "LiftStats",
+    description:
+      "Offline-first workout tracker with analytics. React Native/Expo, SQLite, Supabase sync. Shipped on the App Store.",
+    link: "https://apps.apple.com/app/id6758020980",
+    label: "App Store",
+  },
+  {
+    name: "wordbridge",
+    description: "Two-player word game, live in production.",
+    link: "https://wordbridge.lol",
+    label: "wordbridge.lol",
+  },
+  {
+    name: "swipe-brawl",
+    description: "Lightweight mobile-browser Smash Bros-style brawler.",
+    link: "https://github.com/npangarang/swipe-brawl",
+    label: "GitHub",
+  },
+  {
+    name: "chess visualizer",
+    description:
+      "Chrome MV3 extension overlaying a per-square pressure heatmap on chess.com boards.",
+    link: "https://github.com/npangarang/chess_visualizer",
+    label: "GitHub",
+  },
+];
 
 export const AVAILABLE_COMMANDS = [
   "help",
@@ -147,6 +199,7 @@ export const AVAILABLE_COMMANDS = [
   "education",
   "skills",
   "experience",
+  "projects",
   "resume",
   "clear",
 ];

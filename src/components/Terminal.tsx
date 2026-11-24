@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Mail, Linkedin, Github } from "lucide-react";
+import { Mail, Linkedin, Github, Terminal as TerminalIcon } from "lucide-react";
 import {
   ABOUT,
   EDUCATION,
@@ -184,6 +184,10 @@ interface Line {
   typing?: boolean;
 }
 
+// The window is hidden with CSS (`hidden`), never unmounted, so the session
+// buffer, history, typed input and sprite animation survive close/minimize.
+type WindowMode = "open" | "closed" | "minimized";
+
 // ── Placeholder suggestions ────────────────────────────────────
 const SUGGESTIONS = ["about", "education", "skills", "experience", "resume", "help"];
 
@@ -257,17 +261,66 @@ const Terminal: React.FC = () => {
   // row uses a 0.5s CSS fade — much shorter than the hint — so waiting
   // on the hint covers it as well.
   const [hintTyped, setHintTyped] = useState(false);
+  const [windowMode, setWindowMode] = useState<WindowMode>("open");
+  const [isMaximized, setIsMaximized] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const wasHiddenRef = useRef(false);
   const idCounter = useRef(0);
 
+  const isOpen = windowMode === "open";
+
   const scrollToBottom = useCallback(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    bottomRef.current?.scrollIntoView?.({
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
   }, []);
 
   useEffect(scrollToBottom, [lines, scrollToBottom]);
 
+  // The persistent header grows after mount (banner → contacts → hint). On
+  // short phones/landscape that growth can push the live prompt below the
+  // terminal body's fold. Once the header has settled, keep the command line
+  // in view; on tall screens this is a no-op because the body does not scroll.
+  useEffect(() => {
+    if (hintTyped) scrollToBottom();
+  }, [hintTyped, scrollToBottom]);
+
+  // Move focus with the window: to the launcher when the terminal is put
+  // away, and back to the command line when it is reopened. The terminal
+  // itself stays mounted so the prompt value and output history are intact.
+  useEffect(() => {
+    if (!isOpen) {
+      wasHiddenRef.current = true;
+      launcherRef.current?.focus();
+      return;
+    }
+    if (wasHiddenRef.current) {
+      wasHiddenRef.current = false;
+      inputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   const focusInput = () => inputRef.current?.focus();
+
+  // Clicking the terminal chrome focuses the prompt, but never steals focus
+  // from a real control (window buttons, chips, links, command chips).
+  const handleWindowClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement | null;
+    if (
+      target?.closest(
+        'button, a, input, textarea, select, summary, label, [role="button"], [role="link"], [contenteditable="true"]',
+      )
+    ) {
+      return;
+    }
+    focusInput();
+  };
 
   const suggestion = useCyclingSuggestion(!hasInteracted);
 
@@ -346,11 +399,20 @@ const Terminal: React.FC = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Tab") {
+      // Shift+Tab always navigates backwards. Forward Tab completes only
+      // when it adds information (an empty or already-complete prompt falls
+      // through), so repeated Tab can leave the input instead of trapping
+      // keyboard focus here forever.
+      if (e.shiftKey) return;
+
+      const partial = input.trim().toLowerCase();
+      const match = partial
+        ? AVAILABLE_COMMANDS.find((c) => c.startsWith(partial))
+        : undefined;
+      if (!match || match.toLowerCase() === partial) return;
+
       e.preventDefault();
-      const partial = input.toLowerCase();
-      if (!partial) return;
-      const match = AVAILABLE_COMMANDS.find((c) => c.startsWith(partial));
-      if (match) setInput(match);
+      setInput(match);
       return;
     }
 
@@ -376,153 +438,209 @@ const Terminal: React.FC = () => {
   };
 
   return (
-    <div className="terminal-window" onClick={focusInput}>
-      {/* Particle backdrop — clipped to the terminal frame by the
-          window's overflow: hidden, layered behind all content. */}
-      <ParticleBackground />
+    <>
+      <div
+        className={`terminal-window${isMaximized ? " terminal-window--maximized" : ""}`}
+        hidden={!isOpen}
+        onClick={handleWindowClick}
+      >
+        {/* Particle backdrop — clipped to the terminal frame by the
+            window's overflow: hidden, layered behind all content. */}
+        <ParticleBackground />
 
-      {/* Title bar */}
-      <div className="terminal-titlebar">
-        <div className="flex gap-2">
-          <span className="terminal-dot" style={{ background: "#ff5f57" }} />
-          <span className="terminal-dot" style={{ background: "#febc2e" }} />
-          <span className="terminal-dot" style={{ background: "#28c840" }} />
-        </div>
-        <div className="terminal-title-group">
-          <span className="terminal-title">neel@portfolio ~ % zsh</span>
-          <div className="terminal-agent-slot">
-            <AgentAtWork />
-          </div>
-        </div>
-        <div className="terminal-titlebar-spacer" aria-hidden="true" />
-      </div>
-
-      {/* Terminal body */}
-      <div className="terminal-body">
-        {/* Persistent header chrome — mounts once, never re-mounted by
-            `clear`. Order is: ASCII identity banner → contact icon row
-            → "Type help..." hint. The contact nav and its links stop
-            click propagation so they don't steal focus from the
-            command input (the terminal-window below focuses on any
-            bubbled click). */}
-        <div className="terminal-line">
-          <AnimatedBanner onComplete={() => setBannerTyped(true)} />
-        </div>
-        {bannerTyped && (
-          <nav
-            className="terminal-header-links"
-            aria-label="Contact"
-            onClick={(e) => e.stopPropagation()}
+        {/* Title bar */}
+        <div className="terminal-titlebar">
+          <div
+            className="terminal-window-controls"
+            role="group"
+            aria-label="Terminal window controls"
           >
-            {CONTACT_LINKS.map((link) => {
-              const Icon = ICON_MAP[link.label];
-              const isExternal = link.link.startsWith("http");
-              return (
-                <a
-                  key={link.label}
-                  href={link.link}
-                  className="terminal-header-link"
-                  aria-label={`${link.label}: ${link.value}`}
-                  title={link.value}
-                  target={isExternal ? "_blank" : undefined}
-                  rel={isExternal ? "noopener noreferrer" : undefined}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Icon size={14} strokeWidth={1.75} aria-hidden="true" />
-                </a>
-              );
-            })}
-          </nav>
-        )}
-        {bannerTyped && (
-          <div className="terminal-line">
-            <pre className="terminal-output">
-              <TypewriterText
-                content={parseColour(HELP_HINT, executeCommand)}
-                speed={8}
-                onComplete={() => setHintTyped(true)}
-              />
-            </pre>
-          </div>
-        )}
-
-        {/* Command + output buffer — wiped by `clear`. */}
-        {lines.map((line) => (
-          <div key={line.id} className="terminal-line">
-            {line.type === "input" ? (
-              <div>
-                <span className="terminal-prompt">neel@portfolio</span>
-                <span style={{ color: "#00fff5" }}>:</span>
-                <span style={{ color: "#39ff14" }}>~</span>
-                <span style={{ color: "#00fff5" }}>$ </span>
-                <span>{line.content}</span>
-              </div>
-            ) : (
-              <pre className="terminal-output">
-                {line.typing ? (
-                  <TypewriterText
-                    content={parseColour(line.content, executeCommand)}
-                    speed={8}
-                    onComplete={() => handleTypewriterComplete(line.id)}
-                  />
-                ) : (
-                  parseColour(line.content, executeCommand)
-                )}
-              </pre>
-            )}
-          </div>
-        ))}
-
-        {/* Active prompt */}
-        <form onSubmit={handleSubmit} className="terminal-input-line">
-          <span className="terminal-prompt">neel@portfolio</span>
-          <span style={{ color: "#00fff5" }}>:</span>
-          <span style={{ color: "#39ff14" }}>~</span>
-          <span style={{ color: "#00fff5" }}>$&nbsp;</span>
-          <div className="terminal-input-wrapper">
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              className="terminal-input"
-              autoFocus
-              spellCheck={false}
-              autoComplete="on"
-            />
-            {!hasInteracted && !input && suggestion && (
-              <span className="terminal-suggestion">{suggestion}</span>
-            )}
-          </div>
-        </form>
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Bottom dock: the walker lane floats above the chip bar, so wrapping
-          chips (phones) never collide with sprites. PixelWalkers reserves
-          matching clearance inside the scrollable body. */}
-      <div className="terminal-bottom-dock">
-        <PixelWalkers />
-        <div className="terminal-chips">
-          {COMMAND_CHIPS.map((cmd) => (
             <button
-              key={cmd}
-              className="terminal-chip"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (typingLineId !== null || !hintTyped) return;
-                executeCommand(cmd);
-              }}
+              type="button"
+              className="terminal-window-control terminal-window-control--close"
+              aria-label="Close terminal"
+              title="Close terminal"
+              onClick={() => setWindowMode("closed")}
             >
-              {cmd}
+              <span className="terminal-dot" aria-hidden="true" />
             </button>
-          ))}
+            <button
+              type="button"
+              className="terminal-window-control terminal-window-control--minimize"
+              aria-label="Minimize terminal"
+              title="Minimize terminal"
+              onClick={() => setWindowMode("minimized")}
+            >
+              <span className="terminal-dot" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="terminal-window-control terminal-window-control--maximize"
+              aria-label={isMaximized ? "Restore terminal" : "Maximize terminal"}
+              aria-pressed={isMaximized}
+              title={isMaximized ? "Restore terminal" : "Maximize terminal"}
+              onClick={() => setIsMaximized((maximized) => !maximized)}
+            >
+              <span className="terminal-dot" aria-hidden="true" />
+            </button>
+          </div>
+          <div className="terminal-title-group">
+            <span className="terminal-title">neel@portfolio ~ % zsh</span>
+            <div className="terminal-agent-slot">
+              <AgentAtWork />
+            </div>
+          </div>
+          <div className="terminal-titlebar-spacer" aria-hidden="true" />
         </div>
+
+        {/* Terminal body */}
+        <div className="terminal-body">
+          {/* Persistent header chrome — mounts once, never re-mounted by
+              `clear`. Order is: ASCII identity banner → contact icon row
+              → "Type help..." hint. The contact nav and its links stop
+              click propagation so they don't steal focus from the
+              command input (the terminal-window below focuses on any
+              bubbled click). */}
+          <div className="terminal-line">
+            <AnimatedBanner onComplete={() => setBannerTyped(true)} />
+          </div>
+          {bannerTyped && (
+            <nav
+              className="terminal-header-links"
+              aria-label="Contact"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {CONTACT_LINKS.map((link) => {
+                const Icon = ICON_MAP[link.label];
+                const isExternal = link.link.startsWith("http");
+                return (
+                  <a
+                    key={link.label}
+                    href={link.link}
+                    className="terminal-header-link"
+                    aria-label={`${link.label}: ${link.value}`}
+                    title={link.value}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Icon size={14} strokeWidth={1.75} aria-hidden="true" />
+                  </a>
+                );
+              })}
+            </nav>
+          )}
+          {bannerTyped && (
+            <div className="terminal-line">
+              <pre className="terminal-output">
+                <TypewriterText
+                  content={parseColour(HELP_HINT, executeCommand)}
+                  speed={8}
+                  onComplete={() => setHintTyped(true)}
+                />
+              </pre>
+            </div>
+          )}
+
+          {/* Command + output buffer — wiped by `clear`. */}
+          {lines.map((line) => (
+            <div key={line.id} className="terminal-line">
+              {line.type === "input" ? (
+                <div>
+                  <span className="terminal-prompt">neel@portfolio</span>
+                  <span style={{ color: "#00fff5" }}>:</span>
+                  <span style={{ color: "#39ff14" }}>~</span>
+                  <span style={{ color: "#00fff5" }}>$ </span>
+                  <span>{line.content}</span>
+                </div>
+              ) : (
+                <pre className="terminal-output">
+                  {line.typing ? (
+                    <TypewriterText
+                      content={parseColour(line.content, executeCommand)}
+                      speed={8}
+                      onComplete={() => handleTypewriterComplete(line.id)}
+                    />
+                  ) : (
+                    parseColour(line.content, executeCommand)
+                  )}
+                </pre>
+              )}
+            </div>
+          ))}
+
+          {/* Active prompt */}
+          <form onSubmit={handleSubmit} className="terminal-input-line">
+            <span className="terminal-prompt">neel@portfolio</span>
+            <span style={{ color: "#00fff5" }}>:</span>
+            <span style={{ color: "#39ff14" }}>~</span>
+            <span style={{ color: "#00fff5" }}>$&nbsp;</span>
+            <div className="terminal-input-wrapper">
+              <label htmlFor="terminal-command-input" className="sr-only">
+                Terminal command
+              </label>
+              <input
+                ref={inputRef}
+                id="terminal-command-input"
+                value={input}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                className="terminal-input"
+                autoFocus
+                spellCheck={false}
+                autoComplete="on"
+              />
+              {!hasInteracted && !input && suggestion && (
+                <span className="terminal-suggestion">{suggestion}</span>
+              )}
+            </div>
+          </form>
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Bottom dock: the walker lane floats above the chip bar, so wrapping
+            chips (phones) never collide with sprites. PixelWalkers reserves
+            matching clearance inside the scrollable body. */}
+        <div className="terminal-bottom-dock">
+          <PixelWalkers />
+          <div className="terminal-chips">
+            {COMMAND_CHIPS.map((cmd) => (
+              <button
+                key={cmd}
+                className="terminal-chip"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (typingLineId !== null || !hintTyped) return;
+                  executeCommand(cmd);
+                }}
+              >
+                {cmd}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Scanline overlay */}
+        <div className="scanline-overlay" />
       </div>
 
-      {/* Scanline overlay */}
-      <div className="scanline-overlay" />
-    </div>
+      {/* Launcher shown after Close or Minimize. The terminal above stays
+          mounted (and hidden) so its buffer, history, input and sprites are
+          all preserved exactly as the user left them. */}
+      {!isOpen && (
+        <button
+          ref={launcherRef}
+          type="button"
+          className="terminal-launcher"
+          aria-label="Open terminal"
+          title="Open terminal"
+          onClick={() => setWindowMode("open")}
+        >
+          <TerminalIcon size={16} strokeWidth={2} aria-hidden="true" />
+          <span className="terminal-launcher-label">Terminal</span>
+        </button>
+      )}
+    </>
   );
 };
 

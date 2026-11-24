@@ -1,5 +1,17 @@
 /* Terminal-specific styles — standalone, does not touch design system */
 
+/* Page frame: a definite dynamic viewport height gives the maximized window
+   a real percentage basis and keeps the 90dvh window (plus its 8–16px page
+   padding) inside short landscape viewports too. */
+.terminal-page {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow-x: hidden;
+}
+
 .terminal-window {
   position: relative;
   /* Establish a stacking context so the particle backdrop (negative
@@ -9,7 +21,11 @@
   width: 100%;
   max-width: 900px;
   height: 90vh;
+  height: 90dvh;
   max-height: 700px;
+  /* Land inside the dynamic viewport (short landscape included) instead of
+     letting the 90vh frame plus page padding spill past the bottom edge. */
+  max-height: min(700px, 100%);
   border-radius: 10px;
   overflow: hidden;
   display: flex;
@@ -24,21 +40,113 @@
     0 0 80px rgba(57, 255, 20, 0.04);
 }
 
+/* Close/minimize keeps the component mounted; `hidden` removes it from
+   layout and the accessibility tree without discarding session state. */
+.terminal-window[hidden] {
+  display: none;
+}
+
+/* Maximize uses the whole stage content box, including the dynamic viewport
+   height on mobile browsers. Restore snaps back to the 900 × 700 / 90dvh
+   window above. */
+.terminal-window--maximized {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: 100%;
+}
+
 /* Title bar */
 .terminal-titlebar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
+  gap: 8px;
+  padding: 4px 12px;
   background: #161b22;
   border-bottom: 1px solid #1e2a3a;
   user-select: none;
+}
+
+/* Traffic-light buttons: the visible dot stays the familiar 12px mark, while
+   the transparent 44×44 native button around it provides a comfortable
+   pointer/touch target and a clear focus ring. */
+.terminal-window-controls {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.terminal-window-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background-color 0.16s ease;
+}
+
+.terminal-window-control:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.terminal-window-control:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.terminal-window-control:focus-visible {
+  outline: 2px solid #00fff5;
+  outline-offset: -4px;
+  background: rgba(0, 255, 245, 0.08);
 }
 
 .terminal-dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.terminal-window-control--close .terminal-dot {
+  background: #ff5f57;
+}
+
+.terminal-window-control--minimize .terminal-dot {
+  background: #febc2e;
+}
+
+.terminal-window-control--maximize .terminal-dot {
+  background: #28c840;
+}
+
+.terminal-window-control:hover .terminal-dot {
+  transform: scale(1.12);
+}
+
+.terminal-window-control--close:hover .terminal-dot {
+  box-shadow: 0 0 9px rgba(255, 95, 87, 0.7);
+}
+
+.terminal-window-control--minimize:hover .terminal-dot {
+  box-shadow: 0 0 9px rgba(254, 188, 46, 0.7);
+}
+
+.terminal-window-control--maximize:hover .terminal-dot {
+  box-shadow: 0 0 9px rgba(40, 200, 64, 0.7);
+}
+
+.terminal-window-control:active .terminal-dot {
+  transform: scale(0.92);
 }
 
 .terminal-title {
@@ -59,10 +167,11 @@
   min-width: 0;
 }
 
-/* Invisible mirror of the left dots group so the title-group stays centered
-   under the space-between layout and the titlebar keeps its visual balance. */
+/* Invisible mirror of the left control group so the title-group stays
+   centered under the space-between layout and the titlebar keeps its visual
+   balance. 3 controls × 44px (their full hit areas, not just the dots). */
 .terminal-titlebar-spacer {
-  width: 52px; /* 3 dots × 12px + 2 gaps × 8px */
+  width: 132px;
   flex-shrink: 0;
 }
 
@@ -102,11 +211,32 @@
   }
 }
 
+/* The 132px control rail plus a matching centering spacer is too much for a
+   phone titlebar. Drop the spacer and let the title take the remaining row;
+   its ellipsis handles the very narrow case. */
+@media (max-width: 640px) {
+  .terminal-titlebar {
+    justify-content: flex-start;
+  }
+
+  .terminal-titlebar-spacer {
+    display: none;
+  }
+
+  .terminal-title-group {
+    flex: 1 1 auto;
+  }
+}
+
 /* On very narrow viewports the widget competes with the title for space;
    drop it so the title remains readable. */
 @media (max-width: 420px) {
   .terminal-agent-slot {
     display: none;
+  }
+
+  .terminal-title {
+    font-size: 11px;
   }
 }
 
@@ -326,6 +456,12 @@
   padding: 0;
 }
 
+.terminal-input:focus-visible {
+  outline: 2px dashed #00fff5;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .terminal-suggestion {
   position: absolute;
   left: 0;
@@ -349,6 +485,14 @@
 }
 
 .terminal-clickable-cmd:hover {
+  color: #39ff14;
+  background: rgba(0, 255, 245, 0.08);
+  text-decoration-style: solid;
+}
+
+.terminal-clickable-cmd:focus-visible {
+  outline: 2px dashed #00fff5;
+  outline-offset: 2px;
   color: #39ff14;
   background: rgba(0, 255, 245, 0.08);
   text-decoration-style: solid;
@@ -453,6 +597,78 @@
 
 .terminal-chip:active {
   transform: scale(0.95);
+}
+
+.terminal-chip:focus-visible {
+  outline: 2px dashed #00fff5;
+  outline-offset: 2px;
+  background: rgba(0, 255, 245, 0.15);
+  border-color: #00fff5;
+}
+
+/* ── Closed/minimized launcher ─────────────────────────────────
+   Close and Minimize both put the terminal away behind this same small,
+   discoverable button. It deliberately sits in the same centering context as
+   the window, so neither action causes a sideways jump. */
+.terminal-launcher {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  line-height: 1;
+  color: #00fff5;
+  background: #0d1117;
+  border: 1px solid #1e2a3a;
+  border-radius: 8px;
+  box-shadow:
+    0 0 28px rgba(0, 255, 245, 0.08),
+    0 0 60px rgba(57, 255, 20, 0.03);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  animation: terminal-launcher-in 0.22s ease-out both;
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.terminal-launcher svg {
+  flex-shrink: 0;
+}
+
+.terminal-launcher:hover {
+  color: #39ff14;
+  background: #111a24;
+  border-color: #00fff5;
+  box-shadow:
+    0 0 20px rgba(0, 255, 245, 0.18),
+    0 0 50px rgba(57, 255, 20, 0.05);
+}
+
+.terminal-launcher:active {
+  background: rgba(0, 255, 245, 0.1);
+}
+
+.terminal-launcher:focus-visible {
+  outline: 2px solid #00fff5;
+  outline-offset: 3px;
+}
+
+@keyframes terminal-launcher-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Blinking cursor via caret */
@@ -572,6 +788,29 @@
   }
   .terminal-header-link,
   .terminal-header-link:hover {
+    transform: none;
+  }
+}
+
+/* Window chrome + launcher: keep the state changes, drop the movement.
+   Crossfades on colour still communicate hover/focus without motion. */
+@media (prefers-reduced-motion: reduce) {
+  .terminal-window-control,
+  .terminal-window-control .terminal-dot,
+  .terminal-chip,
+  .terminal-clickable-cmd,
+  .terminal-launcher {
+    transition: none;
+  }
+
+  .terminal-launcher {
+    animation: none;
+  }
+
+  .terminal-window-control:hover .terminal-dot,
+  .terminal-window-control:active .terminal-dot,
+  .terminal-chip:active,
+  .terminal-launcher:active {
     transform: none;
   }
 }

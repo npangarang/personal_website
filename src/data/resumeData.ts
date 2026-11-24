@@ -169,27 +169,8 @@ export const PROJECTS: Project[] = [
     name: "LiftStats",
     description:
       "Offline-first workout tracker with analytics. React Native/Expo, SQLite, Supabase sync. Shipped on the App Store.",
-    link: "https://apps.apple.com/app/id6758020980",
-    label: "App Store",
-  },
-  {
-    name: "wordbridge",
-    description: "Two-player word game, live in production.",
-    link: "https://wordbridge.lol",
-    label: "wordbridge.lol",
-  },
-  {
-    name: "swipe-brawl",
-    description: "Lightweight mobile-browser Smash Bros-style brawler.",
-    link: "https://github.com/npangarang/swipe-brawl",
-    label: "GitHub",
-  },
-  {
-    name: "chess visualizer",
-    description:
-      "Chrome MV3 extension overlaying a per-square pressure heatmap on chess.com boards.",
-    link: "https://github.com/npangarang/chess_visualizer",
-    label: "GitHub",
+    link: "https://www.liftstats.app/",
+    label: "liftstats.app",
   },
 ];
 

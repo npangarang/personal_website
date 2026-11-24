@@ -1,9 +1,25 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { AVAILABLE_COMMANDS, PROJECTS } from "@/data/resumeData";
+import { AVAILABLE_COMMANDS } from "@/data/resumeData";
 import { parseColour, runCommand } from "./Terminal";
 
 const ESC = "\x1b";
+
+const LIFTSTATS = {
+  name: "LiftStats",
+  description:
+    "Offline-first workout tracker with analytics. React Native/Expo, SQLite, Supabase sync. Shipped on the App Store.",
+  link: "https://www.liftstats.app/",
+  label: "liftstats.app",
+} as const;
+
+const REMOVED_PROJECT_NAMES = ["wordbridge", "swipe-brawl", "chess visualizer"];
+const REMOVED_PROJECT_LINKS = [
+  "https://wordbridge.lol",
+  "https://github.com/npangarang/swipe-brawl",
+  "https://github.com/npangarang/chess_visualizer",
+];
+const OBSOLETE_APP_STORE_URL = "https://apps.apple.com/app/id6758020980";
 
 describe("parseColour URL markup", () => {
   it("renders a real external anchor with the URL label", () => {
@@ -103,20 +119,32 @@ describe("parseColour mixed markup", () => {
 });
 
 describe("runCommand projects", () => {
-  it("renders every project name, description and URL label", () => {
+  it("renders only the LiftStats name, description and URL label", () => {
     const output = runCommand("projects");
 
     expect(output).not.toContain("command not found");
     expect(output).toContain(`${ESC}[green]▸ Projects${ESC}[/green]`);
 
-    for (const project of PROJECTS) {
-      expect(output).toContain(project.name);
-      expect(output).toContain(project.description);
-      expect(output).toContain(
-        `${ESC}[url:${project.link}]${project.label}${ESC}[/url]`,
-      );
-      expect(output).toContain(`${ESC}[amber]${project.name}${ESC}[/amber]`);
+    expect(output).toContain(`${ESC}[amber]${LIFTSTATS.name}${ESC}[/amber]`);
+    expect(output).toContain(LIFTSTATS.description);
+    expect(output).toContain(
+      `${ESC}[url:${LIFTSTATS.link}]${LIFTSTATS.label}${ESC}[/url]`,
+    );
+  });
+
+  it("omits removed projects and the obsolete App Store URL", () => {
+    const output = runCommand("projects");
+
+    for (const name of REMOVED_PROJECT_NAMES) {
+      expect(output).not.toContain(name);
     }
+
+    for (const link of REMOVED_PROJECT_LINKS) {
+      expect(output).not.toContain(link);
+    }
+
+    expect(output).not.toContain(OBSOLETE_APP_STORE_URL);
+    expect(output).not.toContain("apps.apple.com");
   });
 
   it("normalizes whitespace and case", () => {
@@ -128,5 +156,45 @@ describe("runCommand projects", () => {
     expect(runCommand("help")).toContain(
       `${ESC}[cmd:projects]projects${ESC}[/cmd]`,
     );
+  });
+});
+
+describe("projects rendered presentation", () => {
+  it("presents LiftStats alone as a real external anchor", () => {
+    const { container } = render(<div>{parseColour(runCommand("projects"))}</div>);
+
+    expect(container).toHaveTextContent("▸ Projects");
+    expect(container).toHaveTextContent(LIFTSTATS.name);
+    expect(container).toHaveTextContent(LIFTSTATS.description);
+
+    const links = screen.getAllByRole("link");
+    expect(links).toHaveLength(1);
+
+    const anchor = screen.getByRole("link", { name: LIFTSTATS.label });
+    expect(anchor).toBe(links[0]);
+    expect(anchor.tagName).toBe("A");
+    expect(anchor).toHaveAttribute("href", "https://www.liftstats.app/");
+    expect(anchor).toHaveAttribute("target", "_blank");
+    expect(anchor).toHaveAttribute("rel", "noopener noreferrer");
+    expect(anchor).not.toHaveAttribute("href", OBSOLETE_APP_STORE_URL);
+    expect(
+      screen.queryByRole("link", { name: "App Store" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not render removed project names or links", () => {
+    const { container } = render(<div>{parseColour(runCommand("projects"))}</div>);
+
+    for (const name of REMOVED_PROJECT_NAMES) {
+      expect(container).not.toHaveTextContent(name);
+    }
+
+    for (const link of REMOVED_PROJECT_LINKS) {
+      expect(container.querySelector(`a[href="${link}"]`)).toBeNull();
+    }
+
+    expect(container.querySelector(`a[href="${OBSOLETE_APP_STORE_URL}"]`)).toBeNull();
+    expect(container.querySelector('a[href*="apps.apple.com"]')).toBeNull();
+    expect(container.textContent).not.toContain("apps.apple.com");
   });
 });
